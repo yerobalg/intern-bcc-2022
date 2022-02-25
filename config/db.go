@@ -28,6 +28,9 @@ func InitDB() (*gorm.DB, error) {
 
 	fmt.Println("Successfully connected to database!")
 
-	db.AutoMigrate(&models.Post{})
+	db.AutoMigrate(
+		// &models.Roles{},
+		&models.Users{},
+	)
 	return db, error
 }

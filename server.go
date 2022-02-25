@@ -1,35 +1,37 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	// "github.com/gin-gonic/gin"
 	// c "clean-arch-2/controllers"
-	"clean-arch-2/app/handlers"
+	// "clean-arch-2/app/handlers"
 	"clean-arch-2/config"
-	"clean-arch-2/app/services"
-	"clean-arch-2/app/repositories"
+	// "clean-arch-2/app/services"
+	// "clean-arch-2/app/repositories"
+	//"os"
 	// "clean-arch-2/entities"
 	// model "clean-arch-2/models"
 	// "fmt"
 )
 
 func main() {
-
-	db, err := config.InitDB()
+	_, err := config.InitDB()
 	if err != nil {
 		panic(err)
 	}
 
-	router := config.NewRouter(gin.Default())
+	// config.Init(".server")
 
-	postRepo := repositories.NewPostRepository(db)
-	postService := services.NewPostService(postRepo)
-	postHandler := handlers.NewPostHandler(router, postService)
+	// router := config.NewRouter(gin.Default())
 
-	handlers.NewHandlers(
-		postHandler,
-	).Setup()
+	// postRepo := repositories.NewPostRepository(db)
+	// postService := services.NewPostService(postRepo)
+	// postHandler := handlers.NewPostHandler(router, postService)
+
+	// handlers.NewHandlers(
+	// 	postHandler,
+	// ).Setup()
 	
-	router.Gin.Run()
+	// router.Gin.Run()
 
 	// router.GET("/ping", func(c *gin.Context) {
 	// 	c.JSON(200, gin.H{
