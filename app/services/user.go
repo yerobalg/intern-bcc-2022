@@ -22,7 +22,3 @@ func (s UserService) Login(
 ) (*models.Users, error) {
 	return s.repo.Login(model)
 }
-
-func (s UserService) GetAddresses(id string) (*models.Kabupaten, error) {
-	return s.repo.GetAddresses(id)
-}

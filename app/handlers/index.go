@@ -8,9 +8,12 @@ type Handler interface {
 
 func NewHandlers(
 	authHandler AuthHandler,
+	daerahHandler DaerahHandler,
 ) Handlers {
 	return Handlers{
 		authHandler,
+		daerahHandler,
+
 	}
 }
 
