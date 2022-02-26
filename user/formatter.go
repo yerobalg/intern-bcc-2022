@@ -1,6 +1,4 @@
-package formatter
-
-import "clean-arch-2/app/models"
+package user
 
 type LoginUserFormat struct {
 	Nama     string `json:"nama"`
@@ -14,7 +12,7 @@ type RegisterUserFormat struct {
 	Email    string `json:"email"`
 }
 
-func LoginUser(user *models.Users, token string) LoginUserFormat {
+func LoginFormat(user *Users, token string) LoginUserFormat {
 	return LoginUserFormat{
 		Nama:     user.Nama,
 		Username: user.Username,
@@ -22,7 +20,7 @@ func LoginUser(user *models.Users, token string) LoginUserFormat {
 	}
 }
 
-func RegisterUser(user *models.Users) RegisterUserFormat {
+func RegisterFormat(user *Users) RegisterUserFormat {
 	return RegisterUserFormat{
 		Nama:     user.Nama,
 		Username: user.Username,

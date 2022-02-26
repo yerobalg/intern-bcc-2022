@@ -1,11 +1,8 @@
-package repositories
+package daerah
 
 import (
 	"fmt"
-
-	"gorm.io/gorm"
-	// "fmt"
-	"clean-arch-2/app/models"
+  "gorm.io/gorm"
 )
 
 type DaerahRepository struct {
@@ -17,7 +14,7 @@ func NewDaerahRepository(Conn *gorm.DB) DaerahRepository {
 }
 
 func (r *DaerahRepository) GetDaerah(
-	daerah *[]models.OutputDaerah,
+	daerah *[]OutputDaerah,
 	id string,
 	kolomAsal string,
 	kolomTujuan string,
@@ -25,7 +22,7 @@ func (r *DaerahRepository) GetDaerah(
 ) error {
 	return r.Conn.Raw(
 		fmt.Sprintf(
-			"SELECT %s AS id, nama FROM %s WHERE %sa = ?",
+			"SELECT %s AS id, nama FROM %s WHERE %s = ?",
 			kolomAsal,
 			tabelTujuan,
 			kolomTujuan,

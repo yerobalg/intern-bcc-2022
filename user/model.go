@@ -1,4 +1,4 @@
-package models
+package user
 
 import (
 	"gorm.io/gorm"
@@ -29,4 +29,9 @@ type UserRegisterInput struct {
 type UserLoginInput struct {
 	UsernameOrEmail string `json:"usernameOrEmail" binding:"required"`
 	Password        string `json:"password" binding:"required,min=6"`
+}
+
+type Roles struct {
+	ID 	 uint   `json:"id" gorm:"primary_key"`
+	Nama string `json:"name" gorm:"type:varchar(100);not null"`
 }

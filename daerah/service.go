@@ -1,20 +1,15 @@
-package services
-
-import (
-	"clean-arch-2/app/models"
-	"clean-arch-2/app/repositories"
-)
+package daerah
 
 type DaerahService struct {
-	repo repositories.DaerahRepository
+	repo DaerahRepository
 }
 
-func NewDaerahService(daerahRepo repositories.DaerahRepository) DaerahService {
+func NewDaerahService(daerahRepo DaerahRepository) DaerahService {
 	return DaerahService{repo: daerahRepo}
 }
 
 func (r *DaerahService) GetDaerah(
-	daerah *[]models.OutputDaerah,
+	daerah *[]OutputDaerah,
 	id string,
 	kolomAsal string,
 	kolomTujuan string,

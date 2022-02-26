@@ -1,42 +1,39 @@
 package handlers
 
 import (
-	"clean-arch-2/app/formatter"
-	"clean-arch-2/app/models"
-	"clean-arch-2/app/services"
+	"clean-arch-2/user"
 	"clean-arch-2/config"
 	"clean-arch-2/utilities"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-
 	//"strconv"
 	"strings"
 )
 
 type AuthHandler struct {
 	handler config.Router
-	service services.UserService
+	service user.UserService
 }
 
-func (auth AuthHandler) Setup() {
-	api := auth.handler.BaseRouter
+func (h AuthHandler) Setup() {
+	api := h.handler.BaseRouter
 	{
-		api.POST("/auth/login", auth.Login)
-		api.POST("/auth/register", auth.Register)
+		api.POST("/auth/login", h.Login)
+		api.POST("/auth/register", h.Register)
 	}
 }
 
 func NewAuthHandler(
 	handler config.Router,
-	service services.UserService,
+	service user.UserService,
 ) AuthHandler {
 	return AuthHandler{handler: handler, service: service}
 }
 
-func (auth AuthHandler) Login(c *gin.Context) {
-	var body models.UserLoginInput
+func (h AuthHandler) Login(c *gin.Context) {
+	var body user.UserLoginInput
 
 	if err := c.BindJSON(&body); err != nil {
 		var message string
@@ -53,7 +50,7 @@ func (auth AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	user, err := auth.service.Login(&body)
+	userObj, err := h.service.Login(&body)
 	if err != nil {
 		if strings.Contains(err.Error(), "record not found") {
 			c.JSON(
@@ -79,7 +76,7 @@ func (auth AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	if err := utilities.CheckPassword(body.Password, user.Password); err != nil {
+	if err := utilities.CheckPassword(body.Password, userObj.Password); err != nil {
 		c.JSON(
 			http.StatusBadRequest,
 			utilities.ApiResponse(
@@ -92,7 +89,7 @@ func (auth AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := utilities.EncodeToken(user)
+	token, err := utilities.EncodeToken(userObj)
 	if err != nil {
 		c.JSON(
 			http.StatusInternalServerError,
@@ -112,14 +109,14 @@ func (auth AuthHandler) Login(c *gin.Context) {
 			"Login Sukses",
 			http.StatusOK,
 			"Sukses",
-			formatter.LoginUser(user, token),
+			user.LoginFormat(userObj, token),
 		),
 	)
 }
 
 //Register handler
-func (auth AuthHandler) Register(c *gin.Context) {
-	var body models.UserRegisterInput
+func (h AuthHandler) Register(c *gin.Context) {
+	var body user.UserRegisterInput
 
 	if err := c.BindJSON(&body); err != nil {
 		var message string
@@ -153,7 +150,7 @@ func (auth AuthHandler) Register(c *gin.Context) {
 		)
 	}
 
-	user := models.Users{
+	userObj := user.Users{
 		Username:     body.Username,
 		Email:        body.Email,
 		Password:     password,
@@ -163,7 +160,7 @@ func (auth AuthHandler) Register(c *gin.Context) {
 		RoleID:       body.RoleID,
 	}
 
-	if err := auth.service.Register(&user); err != nil {
+	if err := h.service.Register(&userObj); err != nil {
 		if strings.Contains(err.Error(), "duplicate key value") {
 			c.JSON(
 				http.StatusBadRequest,
@@ -189,7 +186,7 @@ func (auth AuthHandler) Register(c *gin.Context) {
 	}
 
 	var role string
-	if (user.RoleID == 2) {
+	if (userObj.RoleID == 2) {
 		role = "User"
 	} else {
 		role = "Seller"
@@ -201,7 +198,7 @@ func (auth AuthHandler) Register(c *gin.Context) {
 			fmt.Sprintf("Registrasi %s berhasil", role),
 			http.StatusOK,
 			"Sukses",
-			formatter.RegisterUser(&user),
+			user.RegisterFormat(&userObj),
 		),
 	)
 }

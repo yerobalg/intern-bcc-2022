@@ -1,14 +1,11 @@
 package config
 
 import (
-	"clean-arch-2/app/models"
+	"clean-arch-2/user"
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	// "gorm.io/gorm/logger"
-	// "log"
-	"os"
-	// "time"
+  "os"
 )
 
 func InitDB() (*gorm.DB, error) {
@@ -33,7 +30,7 @@ func InitDB() (*gorm.DB, error) {
 
 	db.AutoMigrate(
 		// &models.Roles{},
-		&models.Users{},
+		&user.Users{},
 	)
 	return db, error
 }

@@ -1,12 +1,12 @@
 package utilities
 
 import (
-	"clean-arch-2/app/models"
+	"clean-arch-2/user"
 	"github.com/golang-jwt/jwt/v4"
 	"time"
 )
 
-func EncodeToken(user *models.Users) (string, error) {
+func EncodeToken(user *user.Users) (string, error) {
 	return jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":     user.ID,
 		"roleId": user.RoleID,

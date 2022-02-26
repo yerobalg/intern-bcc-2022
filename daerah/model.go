@@ -1,4 +1,4 @@
-package models
+package daerah
 
 type OutputDaerah struct {
 	ID   string `json:"id"`
@@ -17,7 +17,6 @@ func (JenisDaerah) TableName() string {
 type Provinsi struct {
 	IDProv    string      `gorm:"primary_key;type:varchar(2);column:id_prov;not null"`
 	Nama      string      `gorm:"type:varchar(35);column:nama;not null"`
-	Kabupaten []Kabupaten `gorm:"foreignkey:IDProv; association_foreignkey:IDProv"`
 }
 
 func (Provinsi) TableName() string {
@@ -31,7 +30,6 @@ type Kabupaten struct {
 	IDJenis     uint        `gorm:"column:id_jenis;not null"`
 	Provinsi    Provinsi    `gorm:"foreignKey:IDProv;references:IDProv"`
 	JenisDaerah JenisDaerah `gorm:"foreignKey:IDJenis;references:IDJenis"`
-	Kecamatan   []Kecamatan `gorm:"foreignkey:IDKab;association_foreignkey:IDKab"`
 }
 
 func (Kabupaten) TableName() string {
@@ -43,7 +41,6 @@ type Kecamatan struct {
 	Nama      string      `gorm:"type:varchar(32);column:nama;not null"`
 	IDKab     string      `gorm:"type:varchar(4);column:id_kab;not null"`
 	Kabupaten Kabupaten   `gorm:"foreignKey:IDKab;references:IDKab"`
-	Kelurahan []Kelurahan `gorm:"foreignkey:IDKec;association_foreignkey:IDKec"`
 }
 
 func (Kecamatan) TableName() string {
