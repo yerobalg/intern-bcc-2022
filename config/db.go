@@ -1,11 +1,12 @@
 package config
 
 import (
+	"clean-arch-2/alamat"
 	"clean-arch-2/user"
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-  "os"
+	"os"
 )
 
 func InitDB() (*gorm.DB, error) {
@@ -19,8 +20,7 @@ func InitDB() (*gorm.DB, error) {
 			os.Getenv("DB_PORT"),
 			os.Getenv("DB_DBNAME"),
 		)),
-		&gorm.Config{
-		},
+		&gorm.Config{},
 	)
 
 	if error != nil {
@@ -31,6 +31,7 @@ func InitDB() (*gorm.DB, error) {
 	db.AutoMigrate(
 		// &models.Roles{},
 		&user.Users{},
+		&alamat.Alamat{},
 	)
 	return db, error
 }

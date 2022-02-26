@@ -49,7 +49,7 @@ func (Kecamatan) TableName() string {
 
 type Kelurahan struct {
 	IDKel       string      `gorm:"primary_key;type:varchar(10);column:id_kel;not null"`
-	Nama        string      `gorm:"type:varchar(32);column:nama"`
+	Nama        string      `gorm:"type:varchar(35);column:nama"`
 	IDKec       string      `gorm:"type:varchar(6);column:id_kec"`
 	IDJenis     uint        `gorm:"column:id_jenis;not null"`
 	Kecamatan   Kecamatan   `gorm:"foreignKey:IDKec;references:IDKec"`
