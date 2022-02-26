@@ -27,7 +27,6 @@ func (post PostHandler) Setup() {
 		api.POST("/post/:id")
 		api.DELETE("/post/:id")
 	}
-
 }
 
 func NewPostHandler(

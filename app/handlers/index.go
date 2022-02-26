@@ -7,10 +7,10 @@ type Handler interface {
 }
 
 func NewHandlers(
-	postHandler PostHandler,
+	authHandler AuthHandler,
 ) Handlers {
 	return Handlers{
-		postHandler,
+		authHandler,
 	}
 }
 
