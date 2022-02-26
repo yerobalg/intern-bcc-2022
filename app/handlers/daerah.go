@@ -13,7 +13,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	//"strconv"
-	// "strings"
+	"strings"
 )
 
 type DaerahHandler struct {
@@ -61,13 +61,15 @@ func (daerah DaerahHandler) GetDaerah(paramDaerah string) func(*gin.Context) {
 	daerahAsal = "id_" + daerahAsal
 	daerahTujuan = "id_" + daerahTujuan
 
+	param := "id" + strings.Title(strings.ToLower(paramDaerah))
+
 	return func(c *gin.Context) {
-		idProvinsi, _ := c.Params.Get("idProvinsi")
+		id, _ := c.Params.Get(param)
 		body := []models.OutputDaerah{}
 
 		if err := daerah.service.GetDaerah(
 			&body,
-			idProvinsi,
+			id,
 			daerahAsal,
 			daerahTujuan,
 			paramDaerah,

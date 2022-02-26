@@ -25,7 +25,7 @@ func (r *DaerahRepository) GetDaerah(
 ) error {
 	return r.Conn.Raw(
 		fmt.Sprintf(
-			"SELECT %s AS id, nama FROM %s WHERE %s = ?",
+			"SELECT %s AS id, nama FROM %s WHERE %sa = ?",
 			kolomAsal,
 			tabelTujuan,
 			kolomTujuan,
