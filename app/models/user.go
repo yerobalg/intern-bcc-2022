@@ -22,6 +22,7 @@ type UserRegisterInput struct {
 	Password     string `json:"password" binding:"required,min=6"`
 	Nama         string `json:"nama" binding:"required"`
 	NomorHp      string `json:"nomorHP" binding:"required"`
+	RoleID 		   uint64 `json:"roleID" binding:"required"`
 	JenisKelamin bool   `json:"jenisKelamin" binding:"required"`
 }
 

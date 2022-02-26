@@ -1,11 +1,14 @@
 package config
 
 import (
+	"clean-arch-2/app/models"
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	// "gorm.io/gorm/logger"
+	// "log"
 	"os"
-	"clean-arch-2/app/models"
+	// "time"
 )
 
 func InitDB() (*gorm.DB, error) {
@@ -19,13 +22,13 @@ func InitDB() (*gorm.DB, error) {
 			os.Getenv("DB_PORT"),
 			os.Getenv("DB_DBNAME"),
 		)),
-		&gorm.Config{},
+		&gorm.Config{
+		},
 	)
 
 	if error != nil {
 		return nil, error
 	}
-
 	fmt.Println("Successfully connected to database!")
 
 	db.AutoMigrate(

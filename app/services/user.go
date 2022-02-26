@@ -13,6 +13,16 @@ func NewUserService(userRepo repositories.UserRepository) UserService {
 	return UserService{repo: userRepo}
 }
 
-func (s UserService) Register(model *models.Users)  (error) {
+func (s UserService) Register(model *models.Users) (error) {
 	return s.repo.Register(model)
+}
+
+func (s UserService) Login(
+	model *models.UserLoginInput,
+) (*models.Users, error) {
+	return s.repo.Login(model)
+}
+
+func (s UserService) GetAddresses(id string) (*models.Kabupaten, error) {
+	return s.repo.GetAddresses(id)
 }

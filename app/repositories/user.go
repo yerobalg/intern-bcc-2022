@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"gorm.io/gorm"
-
+	// "fmt"
 	"clean-arch-2/app/models"
 )
 
@@ -15,9 +15,7 @@ func NewUserRepository(Conn *gorm.DB) UserRepository {
 }
 
 func (r *UserRepository) Register(user *models.Users) error {
-	err := r.Conn.Create(&user).Error
-
-	return err
+	return r.Conn.Create(&user).Error
 }
 
 func (r *UserRepository) Login(
@@ -31,6 +29,26 @@ func (r *UserRepository) Login(
 		First(&user)
 	return user, result.Error
 }
+
+// func (r *UserRepository) GetAddresses(id string) (*models.Kabupaten, error) {
+// 	 base := &models.Kabupaten{
+// 		 IDKab: id,
+// 	 }
+
+// 	 fmt.Println("ok")
+
+// 	result := r.Conn.
+// 		// Where("id_prov = ?", id).
+// 		// First(&user)
+// 		// Joins("Kabupaten").Find(&base)
+// 		Preload("Provinsi").
+// 		Preload("JenisDaerah").
+// 		Find(&base)
+
+// 	fmt.Println(result.RowsAffected)
+// 	fmt.Println(result.Error)
+// 	return base, result.Error
+// }
 
 // func (r *UserRepository) FetchAll() ([]models.Users, error) {
 // 	var users []models.Users
