@@ -17,3 +17,7 @@ func (r *DaerahService) GetDaerah(
 ) error {
 	return r.repo.GetDaerah(daerah, id, kolomAsal, kolomTujuan, tabelTujuan)
 }
+
+func (r *DaerahService) GetSemuaProvinsi(provinsi *[]Provinsi) error {
+	return r.repo.GetSemuaProvinsi(provinsi)
+}

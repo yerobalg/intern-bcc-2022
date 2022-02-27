@@ -30,3 +30,7 @@ func (r *DaerahRepository) GetDaerah(
 		id,
 	).Find(&daerah).Error
 }
+
+func (r *DaerahRepository) GetSemuaProvinsi(provinsi *[]Provinsi) error {
+  return r.Conn.Find(&provinsi).Error
+}

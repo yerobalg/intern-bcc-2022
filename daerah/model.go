@@ -15,8 +15,8 @@ func (JenisDaerah) TableName() string {
 }
 
 type Provinsi struct {
-	IDProv    string      `gorm:"primary_key;type:varchar(2);column:id_prov;not null"`
-	Nama      string      `gorm:"type:varchar(35);column:nama;not null"`
+	IDProv    string      `json:"idProvinsi" gorm:"primary_key;type:varchar(2);column:id_prov;not null"`
+	Nama      string      `json:"nama" gorm:"type:varchar(35);column:nama;not null"`
 }
 
 func (Provinsi) TableName() string {
