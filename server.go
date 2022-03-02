@@ -1,10 +1,12 @@
 package main
 
 import (
+	"clean-arch-2/alamat"
 	"clean-arch-2/config"
 	"clean-arch-2/daerah"
 	"clean-arch-2/handlers"
 	"clean-arch-2/middlewares"
+	"clean-arch-2/role"
 	"clean-arch-2/user"
 	"github.com/gin-gonic/gin"
 )
@@ -22,13 +24,17 @@ func main() {
 	//init router
 	router := config.NewRouter(gin.Default())
 	//init middleware
-	authMiddleware := middlewares.Middleware{}
+	middleware := middlewares.Middleware{}
 	// roleMiddleware := middlewares.RoleMiddleware{}
+
+	//init role
+	roleRepo := role.NewRoleRepository(db)
+	roleService := role.NewRoleService(roleRepo)
 
 	//init auth
 	userRepo := user.NewUserRepository(db)
 	userService := user.NewUserService(userRepo)
-	authHandler := handlers.NewAuthHandler(router, userService)
+	authHandler := handlers.NewAuthHandler(router, userService, roleService)
 
 	//init daerah
 	daerahRepo := daerah.NewDaerahRepository(db)
@@ -36,13 +42,24 @@ func main() {
 	daerahHandler := handlers.NewDaerahHandler(
 		router,
 		daerahService,
-		authMiddleware,
+		middleware,
+	)
+
+	//init alamat
+	alamatRepo := alamat.NewAlamatRepository(db)
+	alamatService := alamat.NewAlamatService(alamatRepo)
+	alamatHandler := handlers.NewAlamatHandler(
+		router,
+		alamatService,
+		roleService,
+		middleware,
 	)
 
 	//setup router
 	handlers.NewHandlers(
 		authHandler,
 		daerahHandler,
+		alamatHandler,
 	).Setup()
 
 	router.Gin.Run()

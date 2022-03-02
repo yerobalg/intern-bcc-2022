@@ -18,12 +18,27 @@ type DaerahHandler struct {
 }
 
 func (h DaerahHandler) Setup() {
-	api := h.handler.BaseRouter.Use(h.middleware.AuthMiddleware())
+	api := h.handler.BaseRouter
 	{
-		api.GET("/daerah/provinsi", h.GetSemuaProvinsi)
-		api.GET("/daerah/kabupaten/:idProvinsi", h.GetDaerah)
-		api.GET("/daerah/kecamatan/:idKabupaten", h.GetDaerah)
-		api.GET("/daerah/kelurahan/:idKecamatan", h.GetDaerah)
+		api.GET(
+			"/daerah/provinsi",
+			h.middleware.AuthMiddleware(),
+			h.GetSemuaProvinsi,
+		)
+		api.GET(
+			"/daerah/kabupaten/:idProvinsi",
+			h.middleware.AuthMiddleware(),
+			h.GetDaerah,
+		)
+		api.GET("/daerah/kecamatan/:idKabupaten",
+			h.middleware.AuthMiddleware(),
+			h.GetDaerah,
+		)
+		api.GET(
+			"/daerah/kelurahan/:idKecamatan",
+			h.middleware.AuthMiddleware(),
+			h.GetDaerah,
+		)
 	}
 }
 
@@ -46,7 +61,7 @@ func (h DaerahHandler) GetSemuaProvinsi(c *gin.Context) {
 		c.JSON(
 			http.StatusInternalServerError,
 			utilities.ApiResponse(
-			"Kesalahan sistem gagal mendapatkan seluruh provinsi",
+				"Kesalahan sistem gagal mendapatkan seluruh provinsi",
 				false,
 				nil,
 			),

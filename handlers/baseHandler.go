@@ -9,11 +9,12 @@ type Handler interface {
 func NewHandlers(
 	authHandler AuthHandler,
 	daerahHandler DaerahHandler,
+	alamatHandler AlamatHandler,
 ) Handlers {
 	return Handlers{
 		authHandler,
 		daerahHandler,
-
+		alamatHandler,
 	}
 }
 

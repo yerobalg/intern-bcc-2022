@@ -4,7 +4,7 @@ type AlamatService struct {
 	repo AlamatRepository
 }
 
-func NewUserService(userRepo AlamatRepository) AlamatService {
+func NewAlamatService(userRepo AlamatRepository) AlamatService {
 	return AlamatService{repo: userRepo}
 }
 

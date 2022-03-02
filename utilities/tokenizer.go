@@ -9,7 +9,7 @@ import (
 
 func EncodeToken(user *user.Users) (string, error) {
 	return jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":     user.ID,
+		"userId":     user.ID,
 		"roleId": user.RoleID,
 		"exp":    time.Now().Add(time.Hour * 24 * 7).Unix(),
 	}).SignedString([]byte(os.Getenv("JWT_SECRET_KEY")))

@@ -2,6 +2,7 @@ package user
 
 import (
 	"gorm.io/gorm"
+	"clean-arch-2/role"
 )
 
 type Users struct {
@@ -13,7 +14,7 @@ type Users struct {
 	JenisKelamin bool   `json:"jenisKelamin" gorm:"type:boolean;not null"`
 	RoleID       uint64 `gorm:"type:bigint;not null"`
 	NomorHp      string `json:"nomorHP" gorm:"type:varchar(20);not null;unique"`
-	Role         Roles
+	Role         role.Roles
 }
 
 type UserRegisterInput struct {
@@ -29,9 +30,4 @@ type UserRegisterInput struct {
 type UserLoginInput struct {
 	UsernameOrEmail string `json:"usernameOrEmail" binding:"required"`
 	Password        string `json:"password" binding:"required,min=6"`
-}
-
-type Roles struct {
-	ID 	 uint   `json:"id" gorm:"primary_key"`
-	Nama string `json:"name" gorm:"type:varchar(100);not null"`
 }

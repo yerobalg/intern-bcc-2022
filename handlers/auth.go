@@ -3,6 +3,7 @@ package handlers
 import (
 	"clean-arch-2/config"
 	"clean-arch-2/user"
+	"clean-arch-2/role"
 	"clean-arch-2/utilities"
 	"fmt"
 	"net/http"
@@ -14,6 +15,7 @@ import (
 type AuthHandler struct {
 	handler config.Router
 	service user.UserService
+	roleService role.RoleService
 }
 
 func (h AuthHandler) Setup() {
@@ -27,8 +29,13 @@ func (h AuthHandler) Setup() {
 func NewAuthHandler(
 	handler config.Router,
 	service user.UserService,
+	roleService role.RoleService,
 ) AuthHandler {
-	return AuthHandler{handler: handler, service: service}
+	return AuthHandler{
+		handler: handler, 
+		service: service, 
+		roleService: roleService,
+	}
 }
 
 func (h AuthHandler) Login(c *gin.Context) {
@@ -232,17 +239,12 @@ func (h AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	var role string
-	if userObj.RoleID == 2 {
-		role = "User"
-	} else {
-		role = "Seller"
-	}
+	role, _ := h.roleService.GetRoleById(userObj.RoleID)
 
 	c.JSON(
 		http.StatusCreated,
 		utilities.ApiResponse(
-			fmt.Sprintf("Registrasi %s berhasil", role),
+			fmt.Sprintf("Registrasi %s berhasil", role.Nama),
 			true,
 			user.RegisterFormat(&userObj),
 		),
