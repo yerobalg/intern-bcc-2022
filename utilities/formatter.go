@@ -1,6 +1,7 @@
 package utilities
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
@@ -12,15 +13,24 @@ type response struct {
 
 type meta struct {
 	Message string `json:"message"`
-	Code    int    `json:"code"`
-	Status  string `json:"status"`
+	Success bool   `json:"success"`
 }
 
-func ApiResponse(message string, code int, status string, data interface{}) response {
+type ApiError struct {
+	Field   string `json:"field"`
+	Tag     string `json:"type"`
+	Message string `json:"message"`
+}
+
+type Field struct {
+	Name  string
+	Value string
+}
+
+func ApiResponse(message string, success bool, data interface{}) response {
 	meta := meta{
 		Message: message,
-		Code:    code,
-		Status:  status,
+		Success: success,
 	}
 
 	apires := response{
@@ -30,12 +40,16 @@ func ApiResponse(message string, code int, status string, data interface{}) resp
 
 	return apires
 }
-
 func FormatBindError(err error) interface{} {
-	var errors []string
+	var errors []ApiError
 
 	for _, e := range err.(validator.ValidationErrors) {
-		errors = append(errors, e.Error())
+		fmt.Println(e.Error())
+		errors = append(errors, ApiError{
+			Field:   e.Field(),
+			Tag:     e.Tag(),
+			Message: e.Error(),
+		})
 	}
 
 	return gin.H{"errors": errors}

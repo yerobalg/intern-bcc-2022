@@ -6,7 +6,6 @@ import (
 	"clean-arch-2/handlers"
 	"clean-arch-2/middlewares"
 	"clean-arch-2/user"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,7 +21,6 @@ func main() {
 
 	//init router
 	router := config.NewRouter(gin.Default())
-
 	//init middleware
 	authMiddleware := middlewares.AuthMiddleware{}
 	// roleMiddleware := middlewares.RoleMiddleware{}

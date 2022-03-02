@@ -1,12 +1,12 @@
 package middlewares
 
 import (
+	"clean-arch-2/utilities"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"clean-arch-2/utilities"
 )
 
-type AuthMiddleware struct {}
+type AuthMiddleware struct{}
 
 func (m *AuthMiddleware) AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -15,9 +15,8 @@ func (m *AuthMiddleware) AuthMiddleware() gin.HandlerFunc {
 			c.JSON(
 				http.StatusUnauthorized,
 				utilities.ApiResponse(
-					"You must login to get access",
-					http.StatusUnauthorized,
-					"Unauthorized",
+					"Anda harus login terlebih dahulu",
+					false,
 					nil,
 				),
 			)
@@ -31,8 +30,7 @@ func (m *AuthMiddleware) AuthMiddleware() gin.HandlerFunc {
 				http.StatusUnauthorized,
 				utilities.ApiResponse(
 					"Token tidak valid",
-					http.StatusUnauthorized,
-					"Token tidak valid",
+					false,
 					nil,
 				),
 			)

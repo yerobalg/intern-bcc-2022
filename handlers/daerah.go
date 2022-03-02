@@ -46,9 +46,8 @@ func (h DaerahHandler) GetSemuaProvinsi(c *gin.Context) {
 		c.JSON(
 			http.StatusInternalServerError,
 			utilities.ApiResponse(
-				err.Error(),
-				http.StatusInternalServerError,
-				"Gagal mendapatkan seluruh provinsi",
+			"Kesalahan sistem gagal mendapatkan seluruh provinsi",
+				false,
 				nil,
 			),
 		)
@@ -59,8 +58,7 @@ func (h DaerahHandler) GetSemuaProvinsi(c *gin.Context) {
 		http.StatusOK,
 		utilities.ApiResponse(
 			"Berhasil mendapatkan seluruh provinsi",
-			http.StatusOK,
-			"Sukses",
+			true,
 			&body,
 		),
 	)
@@ -71,19 +69,21 @@ func (h DaerahHandler) GetDaerah(c *gin.Context) {
 	paramDaerah := split[4]
 	paramID := split[5]
 
-	var daerahAsal string
-	var daerahTujuan string
+	var daerahAsal, daerahTujuan, paramTujuan string
 
 	switch paramDaerah {
 	case "kabupaten":
 		daerahAsal = "kab"
 		daerahTujuan = "prov"
+		paramTujuan = "ID provinsi"
 	case "kecamatan":
 		daerahAsal = "kec"
 		daerahTujuan = "kab"
+		paramTujuan = "ID Kabupaten"
 	case "kelurahan":
 		daerahAsal = "kel"
 		daerahTujuan = "kec"
+		paramTujuan = "ID Kecamatan"
 	}
 
 	daerahAsal = "id_" + daerahAsal
@@ -102,8 +102,7 @@ func (h DaerahHandler) GetDaerah(c *gin.Context) {
 			http.StatusInternalServerError,
 			utilities.ApiResponse(
 				err.Error(),
-				http.StatusInternalServerError,
-				"Gagal mendapatkan daerah",
+				false,
 				nil,
 			),
 		)
@@ -114,9 +113,8 @@ func (h DaerahHandler) GetDaerah(c *gin.Context) {
 		c.JSON(
 			http.StatusNotFound,
 			utilities.ApiResponse(
-				fmt.Sprintf("%s tidak ditemukan", paramDaerah),
-				http.StatusNotFound,
-				"Data tidak ditemukan",
+				fmt.Sprintf("%s tidak ditemukan", paramTujuan),
+				false,
 				nil,
 			),
 		)
@@ -127,8 +125,7 @@ func (h DaerahHandler) GetDaerah(c *gin.Context) {
 		http.StatusOK,
 		utilities.ApiResponse(
 			fmt.Sprintf("Berhasil mengambil %s", paramDaerah),
-			http.StatusOK,
-			"Sukses",
+			true,
 			&body,
 		),
 	)

@@ -1,15 +1,14 @@
 package handlers
 
 import (
-	"clean-arch-2/user"
 	"clean-arch-2/config"
+	"clean-arch-2/user"
 	"clean-arch-2/utilities"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
-	//"strconv"
-	"strings"
 )
 
 type AuthHandler struct {
@@ -36,15 +35,35 @@ func (h AuthHandler) Login(c *gin.Context) {
 	var body user.UserLoginInput
 
 	if err := c.BindJSON(&body); err != nil {
-		var message string
-		
 		c.JSON(
 			http.StatusBadRequest,
 			utilities.ApiResponse(
-				message,
-				http.StatusBadRequest,
-				"Validation Error",
+				"Harap isi semua data",
+				false,
 				utilities.FormatBindError(err),
+			),
+		)
+		return
+	}
+
+	fieldContainSpaces := utilities.FieldContainSpaces([]utilities.Field{
+		{
+			Name:  "username atau email",
+			Value: body.UsernameOrEmail,
+		},
+		{
+			Name:  "password",
+			Value: body.Password,
+		},
+	})
+
+	if len(fieldContainSpaces) > 0 {
+		c.JSON(
+			http.StatusBadRequest,
+			utilities.ApiResponse(
+				"Terdapat field yang tidak boleh mengandung spasi",
+				false,
+				gin.H{"errors": fieldContainSpaces},
 			),
 		)
 		return
@@ -57,8 +76,7 @@ func (h AuthHandler) Login(c *gin.Context) {
 				http.StatusBadRequest,
 				utilities.ApiResponse(
 					"Username atau email tidak terdaftar",
-					http.StatusBadRequest,
-					"Validation Error",
+					false,
 					nil,
 				),
 			)
@@ -67,8 +85,7 @@ func (h AuthHandler) Login(c *gin.Context) {
 				http.StatusInternalServerError,
 				utilities.ApiResponse(
 					"Gagal melakukan login",
-					http.StatusInternalServerError,
-					"Internal Server Error",
+					false,
 					nil,
 				),
 			)
@@ -81,8 +98,7 @@ func (h AuthHandler) Login(c *gin.Context) {
 			http.StatusBadRequest,
 			utilities.ApiResponse(
 				"Password salah",
-				http.StatusBadRequest,
-				"Validation Error",
+				false,
 				nil,
 			),
 		)
@@ -95,8 +111,7 @@ func (h AuthHandler) Login(c *gin.Context) {
 			http.StatusInternalServerError,
 			utilities.ApiResponse(
 				"Gagal membuat token",
-				http.StatusInternalServerError,
-				"Internal Server Error",
+				false,
 				nil,
 			),
 		)
@@ -107,8 +122,7 @@ func (h AuthHandler) Login(c *gin.Context) {
 		http.StatusOK,
 		utilities.ApiResponse(
 			"Login Sukses",
-			http.StatusOK,
-			"Sukses",
+			true,
 			user.LoginFormat(userObj, token),
 		),
 	)
@@ -119,19 +133,55 @@ func (h AuthHandler) Register(c *gin.Context) {
 	var body user.UserRegisterInput
 
 	if err := c.BindJSON(&body); err != nil {
-		var message string
-		if (!strings.Contains(err.Error(), "'min' tag")) {
-			message = "Harap isi semua data"
-		} else {
-			message = "Panjang password minimal 6 karakter"
-		}
 		c.JSON(
 			http.StatusBadRequest,
 			utilities.ApiResponse(
-				message,
-				http.StatusBadRequest,
-				"Validation Error",
+				"Validasi error",
+				false,
 				utilities.FormatBindError(err),
+			),
+		)
+		return
+	}
+
+	fieldContainSpaces := utilities.FieldContainSpaces([]utilities.Field{
+		{
+			Name:  "password",
+			Value: body.Password,
+		},
+	})
+
+	if len(fieldContainSpaces) > 0 {
+		c.JSON(
+			http.StatusBadRequest,
+			utilities.ApiResponse(
+				"Terdapat field yang tidak boleh mengandung spasi",
+				false,
+				gin.H{"errors": fieldContainSpaces},
+			),
+		)
+		return
+	}
+
+	if !utilities.IsValidUsername(body.Username) {
+		c.JSON(
+			http.StatusBadRequest,
+			utilities.ApiResponse(
+				"Username hanya boleh mengandung huruf, angka, titik dan underscore",
+				false,
+				nil,
+			),
+		)
+		return
+	}
+
+	if !utilities.IsValidPassword(body.Password) {
+		c.JSON(
+			http.StatusBadRequest,
+			utilities.ApiResponse(
+				"Password harus mengandung minimal satu huruf dan satu angka",
+				false,
+				nil,
 			),
 		)
 		return
@@ -143,8 +193,7 @@ func (h AuthHandler) Register(c *gin.Context) {
 			http.StatusInternalServerError,
 			utilities.ApiResponse(
 				"Gagal membuat password",
-				http.StatusInternalServerError,
-				"Internal Server Error",
+				false,
 				nil,
 			),
 		)
@@ -165,9 +214,8 @@ func (h AuthHandler) Register(c *gin.Context) {
 			c.JSON(
 				http.StatusBadRequest,
 				utilities.ApiResponse(
-					"Username atau email sudah terdaftar",
-					http.StatusBadRequest,
-					"Validation Error",
+					"Username, email, atau nomor HP sudah terdaftar",
+					false,
 					nil,
 				),
 			)
@@ -176,8 +224,7 @@ func (h AuthHandler) Register(c *gin.Context) {
 				http.StatusInternalServerError,
 				utilities.ApiResponse(
 					"Gagal membuat user",
-					http.StatusInternalServerError,
-					"Internal Server Error",
+					false,
 					nil,
 				),
 			)
@@ -186,18 +233,17 @@ func (h AuthHandler) Register(c *gin.Context) {
 	}
 
 	var role string
-	if (userObj.RoleID == 2) {
+	if userObj.RoleID == 2 {
 		role = "User"
 	} else {
 		role = "Seller"
 	}
 
 	c.JSON(
-		http.StatusOK,
+		http.StatusCreated,
 		utilities.ApiResponse(
 			fmt.Sprintf("Registrasi %s berhasil", role),
-			http.StatusOK,
-			"Sukses",
+			true,
 			user.RegisterFormat(&userObj),
 		),
 	)
