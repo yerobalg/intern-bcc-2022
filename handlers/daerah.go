@@ -14,7 +14,7 @@ import (
 type DaerahHandler struct {
 	handler    config.Router
 	service    daerah.DaerahService
-	middleware middlewares.AuthMiddleware
+	middleware middlewares.Middleware
 }
 
 func (h DaerahHandler) Setup() {
@@ -30,7 +30,7 @@ func (h DaerahHandler) Setup() {
 func NewDaerahHandler(
 	handler config.Router,
 	service daerah.DaerahService,
-	middleware middlewares.AuthMiddleware,
+	middleware middlewares.Middleware,
 ) DaerahHandler {
 	return DaerahHandler{
 		handler:    handler,

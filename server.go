@@ -22,7 +22,7 @@ func main() {
 	//init router
 	router := config.NewRouter(gin.Default())
 	//init middleware
-	authMiddleware := middlewares.AuthMiddleware{}
+	authMiddleware := middlewares.Middleware{}
 	// roleMiddleware := middlewares.RoleMiddleware{}
 
 	//init auth

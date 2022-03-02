@@ -6,9 +6,9 @@ import (
 	"net/http"
 )
 
-type AuthMiddleware struct{}
+type Middleware struct{}
 
-func (m *AuthMiddleware) AuthMiddleware() gin.HandlerFunc {
+func (m *Middleware) AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		header := c.Request.Header.Get("Authorization")
 		if header == "" {
