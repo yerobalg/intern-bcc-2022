@@ -11,3 +11,13 @@ func NewAlamatService(userRepo AlamatRepository) AlamatService {
 func (s AlamatService) Save(model *Alamat) error {
 	return s.repo.Save(model)
 }
+
+func (s AlamatService) Update(model *Alamat) (error) {
+	return s.repo.Update(model)
+}
+
+func (s AlamatService) GetById(id uint64) (alamat *Alamat, err error) {
+	return s.repo.GetById(id)
+}
+
+
