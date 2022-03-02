@@ -36,7 +36,11 @@ func (h AlamatHandler) Setup() {
 			h.middleware.AuthMiddleware(),
 			h.UbahAlamat,
 		)
-		api.DELETE("/alamat/:idAlamat")
+		api.DELETE(
+			"/alamat/:idAlamat",
+			h.middleware.AuthMiddleware(),
+			h.HapusAlamat,
+		)
 	}
 }
 
@@ -152,7 +156,7 @@ func (h *AlamatHandler) UbahAlamat(c *gin.Context) {
 		return
 	}
 
-	if (res.IDUser != userId) {
+	if res.IDUser != userId {
 		c.JSON(
 			http.StatusForbidden,
 			utilities.ApiResponse(
@@ -185,6 +189,73 @@ func (h *AlamatHandler) UbahAlamat(c *gin.Context) {
 		http.StatusOK,
 		utilities.ApiResponse(
 			"Alamat berhasil diubah",
+			true,
+			alamat.AlamatInputFormatter(res),
+		),
+	)
+}
+
+func (h *AlamatHandler) HapusAlamat(c *gin.Context) {
+	idRaw, _ := c.Params.Get("idAlamat")
+	id, _ := strconv.ParseUint(idRaw, 10, 64)
+
+	userIdInterface, _ := c.Get("userId")
+	userId := uint64(userIdInterface.(float64))
+
+	res, err := h.service.GetById(id)
+
+	if err != nil {
+		if strings.Contains(err.Error(), "record not found") {
+			c.JSON(
+				http.StatusNotFound,
+				utilities.ApiResponse(
+					"Alamat tidak ditemukan",
+					false,
+					nil,
+				),
+			)
+		} else {
+			fmt.Println(err)
+			c.JSON(
+				http.StatusInternalServerError,
+				utilities.ApiResponse(
+					"Terjadi kesalahan Sistem",
+					false,
+					err.Error(),
+				),
+			)
+		}
+		return
+	}
+
+	if res.IDUser != userId {
+		c.JSON(
+			http.StatusForbidden,
+			utilities.ApiResponse(
+				"Anda tidak memiliki akses untuk mengubah alamat ini",
+				false,
+				nil,
+			),
+		)
+		return
+	}
+
+	if err := h.service.Delete(res); err != nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			utilities.ApiResponse(
+				"Terjadi kesalahan Sistem",
+				false,
+				err.Error(),
+			),
+		)
+		return
+	}
+
+	c.JSON(
+		http.StatusOK,
+		utilities.ApiResponse(
+			"Alamat berhasil dihapus",
 			true,
 			alamat.AlamatInputFormatter(res),
 		),
