@@ -30,6 +30,11 @@ func (h AlamatHandler) Setup() {
 			h.middleware.RoleMiddleware([]uint64{2, 3}),
 			h.TambahAlamat,
 		)
+		api.GET(
+			"/alamat",
+			h.middleware.AuthMiddleware(),
+			h.GetAlamatUser,
+		)
 		api.GET("/alamat/:idAlamat")
 		api.PUT(
 			"/alamat/:idAlamat",
@@ -258,6 +263,34 @@ func (h *AlamatHandler) HapusAlamat(c *gin.Context) {
 			"Alamat berhasil dihapus",
 			true,
 			alamat.AlamatInputFormatter(res),
+		),
+	)
+}
+
+func (h *AlamatHandler) GetAlamatUser(c *gin.Context) {
+	userIdInterface, _ := c.Get("userId")
+	userId := uint64(userIdInterface.(float64))
+
+	res, err := h.service.GetAllUserAddress(userId)
+
+	if err != nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			utilities.ApiResponse(
+				"Terjadi kesalahan Sistem",
+				false,
+				err.Error(),
+			),
+		)
+		return
+	}
+
+	c.JSON(
+		http.StatusOK,
+		utilities.ApiResponse(
+			"Alamat berhasil diambil",
+			true,
+			alamat.GetUserAlamatFormatter(res),
 		),
 	)
 }

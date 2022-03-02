@@ -29,7 +29,6 @@ type Kabupaten struct {
 	IDProv      string      `gorm:"type:varchar(2);column:id_prov;not null"`
 	IDJenis     uint        `gorm:"column:id_jenis;not null"`
 	Provinsi    Provinsi    `gorm:"foreignKey:IDProv;references:IDProv"`
-	JenisDaerah JenisDaerah `gorm:"foreignKey:IDJenis;references:IDJenis"`
 }
 
 func (Kabupaten) TableName() string {
@@ -53,7 +52,6 @@ type Kelurahan struct {
 	IDKec       string      `gorm:"type:varchar(6);column:id_kec"`
 	IDJenis     uint        `gorm:"column:id_jenis;not null"`
 	Kecamatan   Kecamatan   `gorm:"foreignKey:IDKec;references:IDKec"`
-	JenisDaerah JenisDaerah `gorm:"foreignKey:IDJenis;references:IDJenis"`
 }
 
 func (Kelurahan) TableName() string {

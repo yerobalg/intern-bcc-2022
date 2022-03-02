@@ -23,3 +23,7 @@ func (s AlamatService) GetById(id uint64) (alamat *Alamat, err error) {
 func (s AlamatService) Delete(alamat *Alamat) error {
 	return s.repo.Delete(alamat)
 }
+
+func (s AlamatService) GetAllUserAddress(idUser uint64) ([]Alamat, error) {
+	return s.repo.GetAllUserAddress(idUser)
+}

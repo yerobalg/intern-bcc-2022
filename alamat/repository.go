@@ -31,3 +31,15 @@ func (r *AlamatRepository) GetById(id uint64) (alamat *Alamat, err error) {
 func (r *AlamatRepository) Delete(alamat *Alamat) (err error) {
 	return r.Conn.Delete(alamat).Error
 }
+
+func (r *AlamatRepository) GetAllUserAddress(idUser uint64) ([]Alamat, error) {
+	alamatList := []Alamat{}
+	result := r.Conn.
+		Preload("Kelurahan").
+		Preload("Kelurahan.Kecamatan").
+		Preload("Kelurahan.Kecamatan.Kabupaten").
+		Preload("Kelurahan.Kecamatan.Kabupaten.Provinsi").
+		Where("id_user = ?", idUser).
+		Find(&alamatList)
+	return alamatList, result.Error
+}
