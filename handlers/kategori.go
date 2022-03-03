@@ -159,3 +159,55 @@ func (h *KategoriHandler) UbahKategori(c *gin.Context) {
 		),
 	)
 }
+
+func (h *KategoriHandler) HapusKategori(c *gin.Context) {
+	idRaw, _ := c.Params.Get("idAlamat")
+	id, _ := strconv.ParseUint(idRaw, 10, 64)
+
+	res, err := h.service.GetById(id)
+
+	if err != nil {
+		if strings.Contains(err.Error(), "record not found") {
+			c.JSON(
+				http.StatusNotFound,
+				utilities.ApiResponse(
+					"Kategori tidak ditemukan",
+					false,
+					nil,
+				),
+			)
+		} else {
+			c.JSON(
+				http.StatusInternalServerError,
+				utilities.ApiResponse(
+					"Terjadi kesalahan Sistem",
+					false,
+					err.Error(),
+				),
+			)
+		}
+		return
+	}
+
+	if err := h.service.Delete(&res); err != nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			utilities.ApiResponse(
+				"Terjadi kesalahan Sistem",
+				false,
+				err.Error(),
+			),
+		)
+		return
+	}
+
+	c.JSON(
+		http.StatusOK,
+		utilities.ApiResponse(
+			"Kategori berhasil dihapus",
+			true,
+			res,
+		),
+	)
+}
+
