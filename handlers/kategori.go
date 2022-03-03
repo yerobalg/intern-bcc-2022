@@ -5,11 +5,14 @@ import (
 	"clean-arch-2/kategori"
 	"clean-arch-2/middlewares"
 	"clean-arch-2/utilities"
+	//"fmt"
+
 	// "fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 type KategoriHandler struct {
@@ -30,11 +33,15 @@ func (h KategoriHandler) Setup() {
 		)
 		api.GET(
 			"/kategori",
-			h.GetSemuaKategori,
+			h.GetKategoriOrTag(false),
 		)
 		api.GET(
 			"/kategori/:idKategori",
 			h.GetKategoriByID,
+		)
+		api.GET(
+			"/kategori/tag",
+			h.GetKategoriOrTag(true),
 		)
 		api.PUT(
 			"/kategori/:idKategori",
@@ -63,6 +70,32 @@ func NewKategoriHandler(
 	}
 }
 
+func (h *KategoriHandler) GetKategoriOrTag(isTag bool) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		res, err := h.service.GetSemuaKategori(isTag)
+		if err != nil {
+			c.JSON(
+				http.StatusInternalServerError,
+				utilities.ApiResponse(
+					"Terjadi kesalahan sistem",
+					false,
+					err.Error(),
+				),
+			)
+			return
+		}
+
+		c.JSON(
+			http.StatusOK,
+			utilities.ApiResponse(
+				"Berhasil mengambil semua kategori",
+				true,
+				kategori.GetSemuaKategoriFormatter(&res),
+			),
+		)
+	}
+}
+
 func (h *KategoriHandler) TambahKategori(c *gin.Context) {
 	var input kategori.KategoriInput
 	if err := c.BindJSON(&input); err != nil {
@@ -77,7 +110,7 @@ func (h *KategoriHandler) TambahKategori(c *gin.Context) {
 		return
 	}
 
-	kategoriObj := kategori.Kategori{Nama: input.Nama}
+	kategoriObj := kategori.Kategori{Nama: input.Nama, IsTag: input.IsTag}
 
 	if err := h.service.Save(&kategoriObj); err != nil {
 		c.JSON(
@@ -94,7 +127,7 @@ func (h *KategoriHandler) TambahKategori(c *gin.Context) {
 	c.JSON(
 		http.StatusOK,
 		utilities.ApiResponse(
-			"Berhasil menambahkan kategori",
+			"Berhasil menambahkan "+isTagName(kategoriObj.IsTag),
 			true,
 			kategori.GetKategoriFormatter(&kategoriObj),
 		),
@@ -125,7 +158,7 @@ func (h *KategoriHandler) UbahKategori(c *gin.Context) {
 			c.JSON(
 				http.StatusNotFound,
 				utilities.ApiResponse(
-					"Kategori tidak ditemukan",
+					isTagName(input.IsTag)+" tidak ditemukan",
 					false,
 					nil,
 				),
@@ -160,7 +193,7 @@ func (h *KategoriHandler) UbahKategori(c *gin.Context) {
 	c.JSON(
 		http.StatusOK,
 		utilities.ApiResponse(
-			"Kategori berhasil diubah",
+			isTagName(res.IsTag)+" berhasil diubah",
 			true,
 			kategori.GetKategoriFormatter(&res),
 		),
@@ -178,7 +211,7 @@ func (h *KategoriHandler) HapusKategori(c *gin.Context) {
 			c.JSON(
 				http.StatusNotFound,
 				utilities.ApiResponse(
-					"Kategori tidak ditemukan",
+					"Tag atau kategori tidak ditemukan",
 					false,
 					nil,
 				),
@@ -211,33 +244,9 @@ func (h *KategoriHandler) HapusKategori(c *gin.Context) {
 	c.JSON(
 		http.StatusOK,
 		utilities.ApiResponse(
-			"Kategori berhasil dihapus",
+			isTagName(res.IsTag)+" berhasil dihapus",
 			true,
 			kategori.GetKategoriFormatter(&res),
-		),
-	)
-}
-
-func (h *KategoriHandler) GetSemuaKategori(c *gin.Context) {
-	res, err := h.service.GetSemuaKategori()
-	if err != nil {
-		c.JSON(
-			http.StatusInternalServerError,
-			utilities.ApiResponse(
-				"Terjadi kesalahan sistem",
-				false,
-				err.Error(),
-			),
-		)
-		return
-	}
-
-	c.JSON(
-		http.StatusOK,
-		utilities.ApiResponse(
-			"Berhasil mengambil semua kategori",
-			true,
-			kategori.GetSemuaKategoriFormatter(&res),
 		),
 	)
 }
@@ -253,7 +262,7 @@ func (h *KategoriHandler) GetKategoriByID(c *gin.Context) {
 			c.JSON(
 				http.StatusNotFound,
 				utilities.ApiResponse(
-					"Kategori tidak ditemukan",
+					"Kategori atau tag tidak ditemukan",
 					false,
 					nil,
 				),
@@ -274,9 +283,17 @@ func (h *KategoriHandler) GetKategoriByID(c *gin.Context) {
 	c.JSON(
 		http.StatusOK,
 		utilities.ApiResponse(
-			"Berhasil mengambil kategori",
+			"Berhasil mengambil "+isTagName(res.IsTag),
 			true,
 			kategori.GetKategoriFormatter(&res),
 		),
 	)
+}
+
+func isTagName(isTag bool) string {
+	if isTag {
+		return "tag"
+	} else {
+		return "kategori"
+	}
 }

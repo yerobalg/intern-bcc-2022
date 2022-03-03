@@ -16,9 +16,9 @@ func (r *ProdukRepository) Save(produk *Produk) error {
 	return r.Conn.Create(produk).Error
 }
 
-func (r *ProdukRepository) GetById(id uint64) (*Produk, error) {
+func (r *ProdukRepository) GetBySlug(slug string) (*Produk, error) {
 	var produk Produk
-	result := r.Conn.Where("id = ?", id).First(&produk)
+	result := r.Conn.Where("slug = ?", slug).First(&produk)
 	return &produk, result.Error
 }
 

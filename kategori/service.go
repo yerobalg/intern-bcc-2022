@@ -24,6 +24,6 @@ func (s *KategoriService) GetById(id uint64) (Kategori, error) {
 	return s.repo.GetById(id)
 }
 
-func (s *KategoriService) GetSemuaKategori() ([]Kategori, error) {
-	return s.repo.GetSemuaKategori()
+func (s *KategoriService) GetSemuaKategori(isTag bool) ([]Kategori, error) {
+	return s.repo.GetSemuaKategori(isTag)
 }

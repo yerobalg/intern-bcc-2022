@@ -30,8 +30,8 @@ func (r *KategoriRepository) GetById(id uint64) (Kategori, error) {
 	return kategori, result.Error
 }
 
-func (r *KategoriRepository) GetSemuaKategori() ([]Kategori, error) {
+func (r *KategoriRepository) GetSemuaKategori(isTag bool) ([]Kategori, error) {
 	var kategori []Kategori
-	result := r.Conn.Find(&kategori)
+	result := r.Conn.Where("is_tag = ?", isTag).Find(&kategori)
 	return kategori, result.Error
 }

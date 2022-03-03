@@ -12,8 +12,8 @@ func (s *ProdukService) Save(produk *Produk) error {
 	return s.repo.Save(produk)
 }
 
-func (s *ProdukService) GetById(id uint64) (*Produk, error) {
-	return s.repo.GetById(id)
+func (s *ProdukService) GetBySlug(slug string) (*Produk, error) {
+	return s.repo.GetBySlug(slug)
 }
 
 func (s *ProdukService) GetByIdSeller(idSeller uint64) (*[]Produk, error) {
