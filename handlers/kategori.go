@@ -30,7 +30,7 @@ func (h KategoriHandler) Setup() {
 		)
 		api.GET(
 			"/kategori",
-			h.GetSemuaKategori,
+			// h.GetSemuaKategori,
 		)
 		api.PUT(
 			"/kategori/:idKategori",
@@ -42,7 +42,7 @@ func (h KategoriHandler) Setup() {
 			"/kategori/:idKategori",
 			h.middleware.AuthMiddleware(),
 			h.middleware.RoleMiddleware([]uint64{1}),
-			h.HapusKategori,
+			// h.HapusKategori,
 		)
 	}
 }
