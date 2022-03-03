@@ -37,32 +37,7 @@ func AlamatInputFormatter(alamat *Alamat) AlamatInputFormat {
 func GetUserAlamatFormatter(alamat []Alamat) []GetAlamatFormatter {
 	var alamatFormatted []GetAlamatFormatter
 	for _, almt := range alamat {
-		kelurahan := DaerahFormat{
-			ID:   almt.Kelurahan.IDKel,
-			Nama: almt.Kelurahan.Nama,
-		}
-		kecamatan := DaerahFormat{
-			ID:   almt.Kelurahan.Kecamatan.IDKec,
-			Nama: almt.Kelurahan.Kecamatan.Nama,
-		}
-		kabupatenKota := DaerahFormat{
-			ID:   almt.Kelurahan.Kecamatan.Kabupaten.IDKab,
-			Nama: almt.Kelurahan.Kecamatan.Kabupaten.Nama,
-		}
-		provinsi := DaerahFormat{
-			ID:   almt.Kelurahan.Kecamatan.Kabupaten.Provinsi.IDProv,
-			Nama: almt.Kelurahan.Kecamatan.Kabupaten.Provinsi.Nama,
-		}
-		alamatFormatted = append(alamatFormatted, GetAlamatFormatter{
-			ID:            almt.ID,
-			Nama:          almt.Nama,
-			AlamatLengkap: almt.AlamatLengkap,
-			KodePos:       almt.KodePos,
-			Kelurahan:     kelurahan,
-			Kecamatan:     kecamatan,
-			KabupatenKota: kabupatenKota,
-			Provinsi:      provinsi,
-		})
+		alamatFormatted = append(alamatFormatted, GetAlamatByIdFormatter(almt))
 	}
 	return alamatFormatted
 }

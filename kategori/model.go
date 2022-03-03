@@ -1,7 +1,9 @@
 package kategori
 
+import "gorm.io/gorm"
+
 type Kategori struct {
-	ID   uint64 `json:"id" gorm:"primary_key;autoIncrement:true;not null;type:bigint"`
+	gorm.Model
 	Nama string `json:"nama" gorm:"type:varchar(100);not null"`
 }
 

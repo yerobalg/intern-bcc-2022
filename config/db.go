@@ -3,6 +3,7 @@ package config
 import (
 	"clean-arch-2/alamat"
 	"clean-arch-2/user"
+	"clean-arch-2/kategori"
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -32,6 +33,7 @@ func InitDB() (*gorm.DB, error) {
 		// &models.Roles{},
 		&user.Users{},
 		&alamat.Alamat{},
+		&kategori.Kategori{},	
 	)
 	return db, error
 }

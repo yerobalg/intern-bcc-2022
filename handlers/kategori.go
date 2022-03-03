@@ -32,6 +32,10 @@ func (h KategoriHandler) Setup() {
 			"/kategori",
 			h.GetSemuaKategori,
 		)
+		api.GET(
+			"/kategori/:idKategori",
+			h.GetKategoriByID,
+		)
 		api.PUT(
 			"/kategori/:idKategori",
 			h.middleware.AuthMiddleware(),
@@ -42,7 +46,7 @@ func (h KategoriHandler) Setup() {
 			"/kategori/:idKategori",
 			h.middleware.AuthMiddleware(),
 			h.middleware.RoleMiddleware([]uint64{1}),
-			// h.HapusKategori,
+			h.HapusKategori,
 		)
 	}
 }
@@ -73,9 +77,9 @@ func (h *KategoriHandler) TambahKategori(c *gin.Context) {
 		return
 	}
 
-	kategori := kategori.Kategori{Nama: input.Nama}
+	kategoriObj := kategori.Kategori{Nama: input.Nama}
 
-	if err := h.service.Save(&kategori); err != nil {
+	if err := h.service.Save(&kategoriObj); err != nil {
 		c.JSON(
 			http.StatusInternalServerError,
 			utilities.ApiResponse(
@@ -87,11 +91,14 @@ func (h *KategoriHandler) TambahKategori(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"status":  "success",
-		"message": "Kategori berhasil ditambahkan",
-		"data":    kategori,
-	})
+	c.JSON(
+		http.StatusOK,
+		utilities.ApiResponse(
+			"Berhasil menambahkan kategori",
+			true,
+			kategori.GetKategoriFormatter(&kategoriObj),
+		),
+	)
 }
 
 func (h *KategoriHandler) UbahKategori(c *gin.Context) {
@@ -138,7 +145,7 @@ func (h *KategoriHandler) UbahKategori(c *gin.Context) {
 
 	res.Nama = input.Nama
 
-	if err := h.service.Save(&res); err != nil {
+	if err := h.service.Update(&res); err != nil {
 		c.JSON(
 			http.StatusInternalServerError,
 			utilities.ApiResponse(
@@ -155,7 +162,7 @@ func (h *KategoriHandler) UbahKategori(c *gin.Context) {
 		utilities.ApiResponse(
 			"Kategori berhasil diubah",
 			true,
-			res,
+			kategori.GetKategoriFormatter(&res),
 		),
 	)
 }
@@ -206,7 +213,7 @@ func (h *KategoriHandler) HapusKategori(c *gin.Context) {
 		utilities.ApiResponse(
 			"Kategori berhasil dihapus",
 			true,
-			res,
+			kategori.GetKategoriFormatter(&res),
 		),
 	)
 }
@@ -230,7 +237,7 @@ func (h *KategoriHandler) GetSemuaKategori(c *gin.Context) {
 		utilities.ApiResponse(
 			"Berhasil mengambil semua kategori",
 			true,
-			res,
+			kategori.GetSemuaKategoriFormatter(&res),
 		),
 	)
 }
@@ -269,7 +276,7 @@ func (h *KategoriHandler) GetKategoriByID(c *gin.Context) {
 		utilities.ApiResponse(
 			"Berhasil mengambil kategori",
 			true,
-			res,
+			kategori.GetKategoriFormatter(&res),
 		),
 	)
 }
