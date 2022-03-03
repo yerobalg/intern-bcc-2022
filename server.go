@@ -9,6 +9,7 @@ import (
 	"clean-arch-2/daerah"
 	"clean-arch-2/alamat"
 	"clean-arch-2/kategori"
+	"clean-arch-2/produk"
 	"github.com/gin-gonic/gin"
 )
 
@@ -65,12 +66,23 @@ func main() {
 		middleware,
 	)
 
+	//init produk
+	produkRepo := produk.NewProdukRepository(db)
+	produkService := produk.NewProdukService(produkRepo)
+	produkHandler := handlers.NewProdukHandler(
+		router,
+		produkService,
+		kategoriService,
+		middleware,
+	)
+
 	//setup router
 	handlers.NewHandlers(
 		authHandler,
 		daerahHandler,
 		alamatHandler,
 		kategoriHandler,
+		produkHandler,
 	).Setup()
 
 	router.Gin.Run()

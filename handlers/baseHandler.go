@@ -11,12 +11,14 @@ func NewHandlers(
 	daerahHandler DaerahHandler,
 	alamatHandler AlamatHandler,
 	kategoriHandler KategoriHandler,
+	produkHandler ProdukHandler,
 ) Handlers {
 	return Handlers{
 		authHandler,
 		daerahHandler,
 		alamatHandler,
 		kategoriHandler,
+		produkHandler,
 	}
 }
 
