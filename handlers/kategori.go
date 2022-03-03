@@ -30,7 +30,7 @@ func (h KategoriHandler) Setup() {
 		)
 		api.GET(
 			"/kategori",
-			// h.GetSemuaKategori,
+			h.GetSemuaKategori,
 		)
 		api.PUT(
 			"/kategori/:idKategori",
@@ -73,7 +73,7 @@ func (h *KategoriHandler) TambahKategori(c *gin.Context) {
 		return
 	}
 
-	kategori := kategori.Kategori{ Nama: input.Nama }
+	kategori := kategori.Kategori{Nama: input.Nama}
 
 	if err := h.service.Save(&kategori); err != nil {
 		c.JSON(
@@ -95,7 +95,7 @@ func (h *KategoriHandler) TambahKategori(c *gin.Context) {
 }
 
 func (h *KategoriHandler) UbahKategori(c *gin.Context) {
-	idRaw, _ := c.Params.Get("idAlamat")
+	idRaw, _ := c.Params.Get("idKategori")
 	id, _ := strconv.ParseUint(idRaw, 10, 64)
 
 	var input kategori.KategoriInput
@@ -161,7 +161,7 @@ func (h *KategoriHandler) UbahKategori(c *gin.Context) {
 }
 
 func (h *KategoriHandler) HapusKategori(c *gin.Context) {
-	idRaw, _ := c.Params.Get("idAlamat")
+	idRaw, _ := c.Params.Get("idKategori")
 	id, _ := strconv.ParseUint(idRaw, 10, 64)
 
 	res, err := h.service.GetById(id)
@@ -211,3 +211,65 @@ func (h *KategoriHandler) HapusKategori(c *gin.Context) {
 	)
 }
 
+func (h *KategoriHandler) GetSemuaKategori(c *gin.Context) {
+	res, err := h.service.GetSemuaKategori()
+	if err != nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			utilities.ApiResponse(
+				"Terjadi kesalahan sistem",
+				false,
+				err.Error(),
+			),
+		)
+		return
+	}
+
+	c.JSON(
+		http.StatusOK,
+		utilities.ApiResponse(
+			"Berhasil mengambil semua kategori",
+			true,
+			res,
+		),
+	)
+}
+
+func (h *KategoriHandler) GetKategoriByID(c *gin.Context) {
+	idRaw, _ := c.Params.Get("idKategori")
+	id, _ := strconv.ParseUint(idRaw, 10, 64)
+
+	res, err := h.service.GetById(id)
+
+	if err != nil {
+		if strings.Contains(err.Error(), "record not found") {
+			c.JSON(
+				http.StatusNotFound,
+				utilities.ApiResponse(
+					"Kategori tidak ditemukan",
+					false,
+					nil,
+				),
+			)
+		} else {
+			c.JSON(
+				http.StatusInternalServerError,
+				utilities.ApiResponse(
+					"Terjadi kesalahan Sistem",
+					false,
+					err.Error(),
+				),
+			)
+		}
+		return
+	}
+
+	c.JSON(
+		http.StatusOK,
+		utilities.ApiResponse(
+			"Berhasil mengambil kategori",
+			true,
+			res,
+		),
+	)
+}
