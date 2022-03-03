@@ -2,7 +2,7 @@ package daerah
 
 import (
 	"fmt"
-  "gorm.io/gorm"
+	"gorm.io/gorm"
 )
 
 type DaerahRepository struct {
@@ -32,5 +32,5 @@ func (r *DaerahRepository) GetDaerah(
 }
 
 func (r *DaerahRepository) GetSemuaProvinsi(provinsi *[]Provinsi) error {
-  return r.Conn.Find(&provinsi).Error
+	return r.Conn.Find(&provinsi).Error
 }

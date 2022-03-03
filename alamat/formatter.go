@@ -8,7 +8,7 @@ type AlamatInputFormat struct {
 	AlamatPembeli bool   `json:"alamatPembeli"`
 }
 
-type GetUserAlamatFormat struct {
+type GetAlamatFormatter struct {
 	ID            uint         `json:"id"`
 	Nama          string       `json:"nama"`
 	AlamatLengkap string       `json:"alamatLengkap"`
@@ -34,8 +34,8 @@ func AlamatInputFormatter(alamat *Alamat) AlamatInputFormat {
 	}
 }
 
-func GetUserAlamatFormatter(alamat []Alamat) []GetUserAlamatFormat {
-	var alamatFormatted []GetUserAlamatFormat
+func GetUserAlamatFormatter(alamat []Alamat) []GetAlamatFormatter {
+	var alamatFormatted []GetAlamatFormatter
 	for _, almt := range alamat {
 		kelurahan := DaerahFormat{
 			ID:   almt.Kelurahan.IDKel,
@@ -53,7 +53,7 @@ func GetUserAlamatFormatter(alamat []Alamat) []GetUserAlamatFormat {
 			ID:   almt.Kelurahan.Kecamatan.Kabupaten.Provinsi.IDProv,
 			Nama: almt.Kelurahan.Kecamatan.Kabupaten.Provinsi.Nama,
 		}
-		alamatFormatted = append(alamatFormatted, GetUserAlamatFormat{
+		alamatFormatted = append(alamatFormatted, GetAlamatFormatter{
 			ID:            almt.ID,
 			Nama:          almt.Nama,
 			AlamatLengkap: almt.AlamatLengkap,
@@ -65,4 +65,33 @@ func GetUserAlamatFormatter(alamat []Alamat) []GetUserAlamatFormat {
 		})
 	}
 	return alamatFormatted
+}
+
+func GetAlamatByIdFormatter(alamat Alamat) GetAlamatFormatter {
+	kelurahan := DaerahFormat{
+		ID:   alamat.Kelurahan.IDKel,
+		Nama: alamat.Kelurahan.Nama,
+	}
+	kecamatan := DaerahFormat{
+		ID:   alamat.Kelurahan.Kecamatan.IDKec,
+		Nama: alamat.Kelurahan.Kecamatan.Nama,
+	}
+	kabupatenKota := DaerahFormat{
+		ID:   alamat.Kelurahan.Kecamatan.Kabupaten.IDKab,
+		Nama: alamat.Kelurahan.Kecamatan.Kabupaten.Nama,
+	}
+	provinsi := DaerahFormat{
+		ID:   alamat.Kelurahan.Kecamatan.Kabupaten.Provinsi.IDProv,
+		Nama: alamat.Kelurahan.Kecamatan.Kabupaten.Provinsi.Nama,
+	}
+	return GetAlamatFormatter{
+		ID:            alamat.ID,
+		Nama:          alamat.Nama,
+		AlamatLengkap: alamat.AlamatLengkap,
+		KodePos:       alamat.KodePos,
+		Kelurahan:     kelurahan,
+		Kecamatan:     kecamatan,
+		KabupatenKota: kabupatenKota,
+		Provinsi:      provinsi,
+	}
 }

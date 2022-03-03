@@ -4,8 +4,8 @@ type AlamatService struct {
 	repo AlamatRepository
 }
 
-func NewAlamatService(userRepo AlamatRepository) AlamatService {
-	return AlamatService{repo: userRepo}
+func NewAlamatService(alamatRepo AlamatRepository) AlamatService {
+	return AlamatService{repo: alamatRepo}
 }
 
 func (s AlamatService) Save(model *Alamat) error {

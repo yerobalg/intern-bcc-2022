@@ -1,13 +1,14 @@
 package main
 
 import (
-	"clean-arch-2/alamat"
 	"clean-arch-2/config"
-	"clean-arch-2/daerah"
 	"clean-arch-2/handlers"
 	"clean-arch-2/middlewares"
 	"clean-arch-2/role"
 	"clean-arch-2/user"
+	"clean-arch-2/daerah"
+	"clean-arch-2/alamat"
+	"clean-arch-2/kategori"
 	"github.com/gin-gonic/gin"
 )
 
@@ -55,11 +56,21 @@ func main() {
 		middleware,
 	)
 
+	//init kategori
+	kategoriRepo := kategori.NewKategoriRepository(db)
+	kategoriService := kategori.NewKategoriService(kategoriRepo)
+	kategoriHandler := handlers.NewKategoriHandler(
+		router,
+		kategoriService,
+		middleware,
+	)
+
 	//setup router
 	handlers.NewHandlers(
 		authHandler,
 		daerahHandler,
 		alamatHandler,
+		kategoriHandler,
 	).Setup()
 
 	router.Gin.Run()

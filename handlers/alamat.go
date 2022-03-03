@@ -6,7 +6,6 @@ import (
 	"clean-arch-2/middlewares"
 	"clean-arch-2/role"
 	"clean-arch-2/utilities"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -35,7 +34,11 @@ func (h AlamatHandler) Setup() {
 			h.middleware.AuthMiddleware(),
 			h.GetAlamatUser,
 		)
-		api.GET("/alamat/:idAlamat")
+		api.GET(
+			"/alamat/:idAlamat",
+			h.middleware.AuthMiddleware(),
+			h.GetAlamatById,
+		)
 		api.PUT(
 			"/alamat/:idAlamat",
 			h.middleware.AuthMiddleware(),
@@ -44,7 +47,12 @@ func (h AlamatHandler) Setup() {
 		api.DELETE(
 			"/alamat/:idAlamat",
 			h.middleware.AuthMiddleware(),
+			h.middleware.RoleMiddleware([]uint64{2}),
 			h.HapusAlamat,
+		)
+		api.GET(
+			"/alamat/seller/:idSeller",
+			h.GetAlamatSeller,
 		)
 	}
 }
@@ -80,6 +88,33 @@ func (h *AlamatHandler) TambahAlamat(c *gin.Context) {
 			),
 		)
 		return
+	}
+
+	if roleId == 3 {
+		res, err := h.service.GetAllUserAddress(userId)
+		if err != nil {
+			c.JSON(
+				http.StatusInternalServerError,
+				utilities.ApiResponse(
+					"Terjadi kesalahan Sistem",
+					false,
+					err.Error(),
+				),
+			)
+			return
+		}
+
+		if len(res) > 0 {
+			c.JSON(
+				http.StatusBadRequest,
+				utilities.ApiResponse(
+					"Seller sudah memiliki alamat",
+					false,
+					nil,
+				),
+			)
+			return
+		}
 	}
 
 	alamatObj := alamat.Alamat{
@@ -148,7 +183,6 @@ func (h *AlamatHandler) UbahAlamat(c *gin.Context) {
 				),
 			)
 		} else {
-			fmt.Println(err)
 			c.JSON(
 				http.StatusInternalServerError,
 				utilities.ApiResponse(
@@ -195,7 +229,7 @@ func (h *AlamatHandler) UbahAlamat(c *gin.Context) {
 		utilities.ApiResponse(
 			"Alamat berhasil diubah",
 			true,
-			alamat.AlamatInputFormatter(res),
+			alamat.GetAlamatByIdFormatter(*res),
 		),
 	)
 }
@@ -220,7 +254,6 @@ func (h *AlamatHandler) HapusAlamat(c *gin.Context) {
 				),
 			)
 		} else {
-			fmt.Println(err)
 			c.JSON(
 				http.StatusInternalServerError,
 				utilities.ApiResponse(
@@ -262,7 +295,7 @@ func (h *AlamatHandler) HapusAlamat(c *gin.Context) {
 		utilities.ApiResponse(
 			"Alamat berhasil dihapus",
 			true,
-			alamat.AlamatInputFormatter(res),
+			alamat.GetAlamatByIdFormatter(*res),
 		),
 	)
 }
@@ -291,6 +324,102 @@ func (h *AlamatHandler) GetAlamatUser(c *gin.Context) {
 			"Alamat berhasil diambil",
 			true,
 			alamat.GetUserAlamatFormatter(res),
+		),
+	)
+}
+
+func (h *AlamatHandler) GetAlamatById(c *gin.Context) {
+	idRaw, _ := c.Params.Get("idAlamat")
+	id, _ := strconv.ParseUint(idRaw, 10, 64)
+
+	userIdInterface, _ := c.Get("userId")
+	userId := uint64(userIdInterface.(float64))
+
+	res, err := h.service.GetById(id)
+
+	if err != nil {
+		if strings.Contains(err.Error(), "record not found") {
+			c.JSON(
+				http.StatusNotFound,
+				utilities.ApiResponse(
+					"Alamat tidak ditemukan",
+					false,
+					nil,
+				),
+			)
+		} else {
+			c.JSON(
+				http.StatusInternalServerError,
+				utilities.ApiResponse(
+					"Terjadi kesalahan Sistem",
+					false,
+					err.Error(),
+				),
+			)
+		}
+		return
+	}
+
+	if res.IDUser != userId {
+		c.JSON(
+			http.StatusForbidden,
+			utilities.ApiResponse(
+				"Anda tidak memiliki akses untuk melihat alamat ini",
+				false,
+				nil,
+			),
+		)
+		return
+	}
+
+	c.JSON(
+		http.StatusOK,
+		utilities.ApiResponse(
+			"Alamat berhasil diambil",
+			true,
+			alamat.GetAlamatByIdFormatter(*res),
+		),
+	)
+}
+
+func (h *AlamatHandler) GetAlamatSeller(c *gin.Context) {
+	idRaw, _ := c.Params.Get("idSeller")
+	id, _ := strconv.ParseUint(idRaw, 10, 64)
+
+	res, err := h.service.GetAllUserAddress(id)
+
+	if err != nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			utilities.ApiResponse(
+				"Terjadi kesalahan Sistem",
+				false,
+				err.Error(),
+			),
+		)
+		return
+	}
+
+	alamatSeller := res[0]
+
+	if (alamatSeller.IsUser) {
+		c.JSON(
+			http.StatusNotFound,
+			utilities.ApiResponse(
+				"Alamat tidak ditemukan",
+				false,
+				nil,
+			),
+		)
+		return
+	}
+
+	c.JSON(
+		http.StatusOK,
+		utilities.ApiResponse(
+			"Alamat Seller berhasil diambil",
+			true,
+			alamat.GetAlamatByIdFormatter(alamatSeller),
 		),
 	)
 }

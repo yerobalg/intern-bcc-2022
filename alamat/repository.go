@@ -23,8 +23,13 @@ func (r *AlamatRepository) Update(alamat *Alamat) error {
 func (r *AlamatRepository) GetById(id uint64) (alamat *Alamat, err error) {
 	alamatObj := &Alamat{}
 
-	result := r.Conn.Where("id = ?", id).First(&alamatObj)
-
+	result := r.Conn.
+		Preload("Kelurahan").
+		Preload("Kelurahan.Kecamatan").
+		Preload("Kelurahan.Kecamatan.Kabupaten").
+		Preload("Kelurahan.Kecamatan.Kabupaten.Provinsi").
+		Where("id = ?", id).
+		First(&alamatObj)
 	return alamatObj, result.Error
 }
 
