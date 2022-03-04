@@ -16,6 +16,20 @@ func (r *ProdukRepository) Save(produk *Produk) error {
 	return r.Conn.Create(produk).Error
 }
 
+func (r *ProdukRepository) SaveKategoriProduk(
+	idKategori []uint64,
+	idProduk uint64,
+) error {
+	var kategoriProduk []Kategori_Produk
+	for _, id := range idKategori {
+		kategoriProduk = append(kategoriProduk, Kategori_Produk{
+			IDKategori: id,
+			IDProduk:   idProduk,
+		})
+	}
+	return r.Conn.Create(&kategoriProduk).Error
+}
+
 func (r *ProdukRepository) GetBySlug(slug string) (*Produk, error) {
 	var produk Produk
 	result := r.Conn.Where("slug = ?", slug).First(&produk)

@@ -6,10 +6,10 @@ import (
 	"clean-arch-2/middlewares"
 	"clean-arch-2/produk"
 	"clean-arch-2/utilities"
-	"net/http"
-	"strings"
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
+	"net/http"
+	"strings"
 )
 
 type ProdukHandler struct {
@@ -98,7 +98,10 @@ func (h *ProdukHandler) TambahProduk(c *gin.Context) {
 		Gender:     body.Gender,
 	}
 
-	if err := h.service.Save(&produkObj); err != nil {
+	idTags := body.IdTags
+	idTags2 := append(idTags, body.IDKategori)
+
+	if err := h.service.Save(&produkObj, idTags2); err != nil {
 		if strings.Contains(err.Error(), "duplicate key value") {
 			c.JSON(
 				http.StatusBadRequest,
@@ -126,7 +129,7 @@ func (h *ProdukHandler) TambahProduk(c *gin.Context) {
 		utilities.ApiResponse(
 			"Produk berhasil ditambahkan",
 			true,
-			produk.GetProdukFormat(&produkObj),
+			produk.GetProdukFormat(&produkObj, body.IDKategori, idTags),
 		),
 	)
 }
@@ -189,12 +192,12 @@ func (h *ProdukHandler) UbahProduk(c *gin.Context) {
 		return
 	}
 
-	c.JSON(
-		http.StatusOK,
-		utilities.ApiResponse(
-			"Produk berhasil diubah",
-			true,
-			produk.GetProdukFormat(res),
-		),
-	)
+	// c.JSON(
+	// 	http.StatusOK,
+	// 	utilities.ApiResponse(
+	// 		"Produk berhasil diubah",
+	// 		true,
+	// 		produk.GetProdukFormat(res, ),
+	// 	),
+	// )
 }

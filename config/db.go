@@ -36,6 +36,7 @@ func InitDB() (*gorm.DB, error) {
 		&alamat.Alamat{},
 		&kategori.Kategori{},	
 		&produk.Produk{},
+		&produk.Kategori_Produk{},
 	)
 	return db, error
 }

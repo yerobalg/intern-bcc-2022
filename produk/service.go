@@ -8,8 +8,13 @@ func NewProdukService(produkRepo ProdukRepository) ProdukService {
 	return ProdukService{repo: produkRepo}
 }
 
-func (s *ProdukService) Save(produk *Produk) error {
-	return s.repo.Save(produk)
+func (s *ProdukService) Save(produk *Produk, idKategori []uint64) error {
+	err := s.repo.Save(produk)
+	if err != nil {
+		return err
+	}
+	err = s.repo.SaveKategoriProduk(idKategori, uint64(produk.ID))
+	return err
 }
 
 func (s *ProdukService) GetBySlug(slug string) (*Produk, error) {
