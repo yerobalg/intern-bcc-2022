@@ -10,7 +10,6 @@ import (
 	"github.com/gosimple/slug"
 	"net/http"
 	"strings"
-	"fmt"
 )
 
 type ProdukHandler struct {
@@ -42,7 +41,8 @@ func (h ProdukHandler) Setup() {
 		api.PUT(
 			"/produk/:slug",
 			h.middleware.AuthMiddleware(),
-			// h.UbahAlamat,
+			h.middleware.RoleMiddleware([]uint64{3}),
+			h.UbahProduk,
 		)
 		api.DELETE(
 			"/produk/:slug",
@@ -88,7 +88,6 @@ func (h *ProdukHandler) TambahProduk(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(body.Diskon)
 
 	if (len(body.IdTags) == 0) { 
 		c.JSON(
@@ -139,8 +138,6 @@ func (h *ProdukHandler) TambahProduk(c *gin.Context) {
 		}
 		return
 	}
-
-	fmt.Println(produkObj.Diskon)
 
 	c.JSON(
 		http.StatusOK,
@@ -199,7 +196,10 @@ func (h *ProdukHandler) UbahProduk(c *gin.Context) {
 	res.IsHiasan = body.IsHiasan
 	res.Gender = body.Gender
 
-	if err := h.service.Update(res); err != nil {
+	idTags := body.IdTags
+	idTags2 := append(idTags, body.IDKategori)
+
+	if err := h.service.Update(res, idTags2); err != nil {
 		c.JSON(
 			http.StatusInternalServerError,
 			utilities.ApiResponse(
@@ -210,6 +210,15 @@ func (h *ProdukHandler) UbahProduk(c *gin.Context) {
 		)
 		return
 	}
+
+	c.JSON(
+		http.StatusOK,
+		utilities.ApiResponse(
+			"Produk berhasil ditambahkan",
+			true,
+			produk.ProdukInputFormatter(res, body.IDKategori, idTags),
+		),
+	)
 }
 
 func (h *ProdukHandler) GetProdukBySlug(c *gin.Context) {
@@ -236,4 +245,8 @@ func (h *ProdukHandler) GetProdukBySlug(c *gin.Context) {
 			produk.ProdukOutputFormatter(*res),
 		),
 	)
+}
+
+func (h *ProdukHandler) HapusProduk(c *gin.Context) {
+	//slug, _ := c.Params.Get("slug")
 }

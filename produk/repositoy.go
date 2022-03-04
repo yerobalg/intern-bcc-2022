@@ -30,6 +30,10 @@ func (r *ProdukRepository) SaveKategoriProduk(
 	return r.Conn.Create(&kategoriProduk).Error
 }
 
+func (r *ProdukRepository) DeleteKategoriProduk(idProduk uint64) error {
+	return r.Conn.Where("id_produk = ?", idProduk).Delete(&Kategori_Produk{}).Error
+}
+
 func (r *ProdukRepository) GetBySlug(slug string) (*Produk, error) {
 	var produk Produk
 	result := r.Conn.
@@ -46,8 +50,41 @@ func (r *ProdukRepository) GetByIdSeller(idSeller uint64) (*[]Produk, error) {
 	return &produk, result.Error
 }
 
-func (r *ProdukRepository) Update(produk *Produk) error {
-	return r.Conn.Save(produk).Error
+func (r *ProdukRepository) Update(prod *Produk) error {
+	return r.Conn.Raw(
+		`
+			UPDATE 
+				"produk" 
+			SET 
+				"created_at" = ?, 
+				"updated_at" = ?, 
+				"deleted_at" = NULL, 
+				"nama_produk" = ?, 
+				"slug" = ?, 
+				"harga" = ?, 
+				"diskon" = ?, 
+				"stok" = ?, 
+				"deskripsi" = ?, 
+				"id_seller" = ?, 
+				"is_hiasan" = ?, 
+				"gender" = ? 
+			WHERE 
+				"id" = ? 
+				AND "produk"."deleted_at" IS NULL
+		`,
+		prod.CreatedAt,
+		prod.UpdatedAt,
+		prod.NamaProduk,
+		prod.Slug,
+		prod.Harga,
+		prod.Diskon,
+		prod.Stok,
+		prod.Deskripsi,
+		prod.IDSeller,
+		prod.IsHiasan,
+		prod.Gender,
+		prod.ID,
+	).Scan(&prod).Error
 }
 
 func (r *ProdukRepository) Delete(produk *Produk) error {

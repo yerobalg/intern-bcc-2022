@@ -25,8 +25,19 @@ func (s *ProdukService) GetByIdSeller(idSeller uint64) (*[]Produk, error) {
 	return s.repo.GetByIdSeller(idSeller)
 }
 
-func (s *ProdukService) Update(produk *Produk) error {
-	return s.repo.Update(produk)
+func (s *ProdukService) Update(
+	produk *Produk, 
+	idKategori[] uint64,
+	) error {
+	if err := s.repo.Update(produk); err != nil {
+		return err
+	}
+
+	if err := s.repo.DeleteKategoriProduk(uint64(produk.ID)); err != nil {
+		return err
+	}
+
+	return s.repo.SaveKategoriProduk(idKategori, uint64(produk.ID))
 }
 
 func (s *ProdukService) Delete(produk *Produk) error {
