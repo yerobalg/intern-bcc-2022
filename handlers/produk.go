@@ -10,6 +10,7 @@ import (
 	"github.com/gosimple/slug"
 	"net/http"
 	"strings"
+	"fmt"
 )
 
 type ProdukHandler struct {
@@ -51,7 +52,7 @@ func (h ProdukHandler) Setup() {
 		)
 		api.GET(
 			"/produk/:slug",
-			// h.GetAlamatSeller,
+			h.GetProdukBySlug,
 		)
 	}
 }
@@ -87,10 +88,25 @@ func (h *ProdukHandler) TambahProduk(c *gin.Context) {
 		return
 	}
 
+	fmt.Println(body.Diskon)
+
+	if (len(body.IdTags) == 0) { 
+		c.JSON(
+			http.StatusBadRequest,
+			utilities.ApiResponse(
+				"Tags tidak boleh kosong",
+				false,
+				nil,
+			),
+		)
+		return
+	}
+
 	produkObj := produk.Produk{
 		NamaProduk: body.NamaProduk,
 		Slug:       slug.Make(body.NamaProduk),
 		Harga:      body.Harga,
+		Diskon:     body.Diskon,
 		Stok:       body.Stok,
 		Deskripsi:  body.Deskripsi,
 		IDSeller:   userId,
@@ -124,12 +140,14 @@ func (h *ProdukHandler) TambahProduk(c *gin.Context) {
 		return
 	}
 
+	fmt.Println(produkObj.Diskon)
+
 	c.JSON(
 		http.StatusOK,
 		utilities.ApiResponse(
 			"Produk berhasil ditambahkan",
 			true,
-			produk.GetProdukFormat(&produkObj, body.IDKategori, idTags),
+			produk.ProdukInputFormatter(&produkObj, body.IDKategori, idTags),
 		),
 	)
 }
@@ -175,6 +193,7 @@ func (h *ProdukHandler) UbahProduk(c *gin.Context) {
 
 	res.NamaProduk = body.NamaProduk
 	res.Harga = body.Harga
+	res.Diskon = body.Diskon
 	res.Stok = body.Stok
 	res.Deskripsi = body.Deskripsi
 	res.IsHiasan = body.IsHiasan
@@ -191,13 +210,30 @@ func (h *ProdukHandler) UbahProduk(c *gin.Context) {
 		)
 		return
 	}
+}
 
-	// c.JSON(
-	// 	http.StatusOK,
-	// 	utilities.ApiResponse(
-	// 		"Produk berhasil diubah",
-	// 		true,
-	// 		produk.GetProdukFormat(res, ),
-	// 	),
-	// )
+func (h *ProdukHandler) GetProdukBySlug(c *gin.Context) {
+	slug, _ := c.Params.Get("slug")
+
+	res, err := h.service.GetBySlug(slug)
+	if err != nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			utilities.ApiResponse(
+				"Terjadi kesalahan sistem",
+				false,
+				err.Error(),
+			),
+		)
+		return
+	}
+
+	c.JSON(
+		http.StatusOK,
+		utilities.ApiResponse(
+			"Berhasil mengambil produk",
+			true,
+			produk.ProdukOutputFormatter(*res),
+		),
+	)
 }

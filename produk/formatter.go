@@ -1,40 +1,88 @@
 package produk
 
-type ProdukFormat struct {
-	NamaProduk string `json:"nama"`
-	Slug       string `json:"slug"`
-	Harga      uint64 `json:"harga"`
-	Stok       uint   `json:"stok"`
-	Deskripsi  string `json:"deskripsi"`
-	Gender     string `json:"gender"`
-	IsHiasan   bool   `json:"isHiasan"`
-	IdKategori uint64 `json:"idKategori"`
-	IdTags  	[]uint64 `json:"idTags"`
+import (
+	"clean-arch-2/kategori"
+)
+
+type ProdukInputFormat struct {
+	NamaProduk string   `json:"nama"`
+	Slug       string   `json:"slug"`
+	Harga      uint64   `json:"harga"`
+	Diskon     float64  `json:"diskon"`
+	Stok       uint     `json:"stok"`
+	Deskripsi  string   `json:"deskripsi"`
+	Gender     string   `json:"gender"`
+	IsHiasan   bool     `json:"isHiasan"`
+	IdKategori uint64   `json:"idKategori"`
+	IdTags     []uint64 `json:"idTags"`
+}
+type ProdukOutputFormat struct {
+	NamaProduk string                    `json:"nama"`
+	Slug       string                    `json:"slug"`
+	Harga      uint64                    `json:"harga"`
+	Diskon     float64                   `json:"diskon"`
+	Stok       uint                      `json:"stok"`
+	Deskripsi  string                    `json:"deskripsi"`
+	Gender     string                    `json:"gender"`
+	IsHiasan   bool                      `json:"isHiasan"`
+	Seller     Seller                    `gorm:"seller"`
+	Kategori   kategori.KategoriFormat   `json:"kategori"`
+	Tags       []kategori.KategoriFormat `json:"tags"`
 }
 
-func GetProdukFormat(
-	produk *Produk, 
-	idKategori uint64, 
+type Seller struct {
+	ID      uint64 `json:"id"`
+	Nama    string `json:"nama"`
+	NomorHp string `json:"nomorHP"`
+}
+
+func ProdukInputFormatter(
+	produk *Produk,
+	idKategori uint64,
 	IdTags []uint64,
-) ProdukFormat {
-	return ProdukFormat{
+) ProdukInputFormat {
+	return ProdukInputFormat{
 		NamaProduk: produk.NamaProduk,
 		Slug:       produk.Slug,
 		Harga:      produk.Harga,
+		Diskon:     produk.Diskon,
 		Stok:       produk.Stok,
 		Deskripsi:  produk.Deskripsi,
 		Gender:     produk.Gender,
 		IsHiasan:   produk.IsHiasan,
 		IdKategori: idKategori,
-		IdTags: IdTags,
+		IdTags:     IdTags,
 	}
 }
 
-// func GetAllProdukFormat(
-// 	produk *[]Produk,idKategori []uint64, idTags [][]uint64) []ProdukFormat {
-// 	var formattedProduk []ProdukFormat
-// 	for _, p := range *produk {
-// 		formattedProduk = append(formattedProduk, GetProdukFormat(&p))
-// 	}
-// 	return formattedProduk
-// }
+func ProdukOutputFormatter(
+	produk Produk,
+) ProdukOutputFormat {
+	daftarKategori := produk.KategoriProduk
+	kategoriProduk := daftarKategori[len(daftarKategori)-1].Kategori
+	var tagProduk []kategori.Kategori
+
+	for i := 0; i < len(daftarKategori[:len(daftarKategori)-1]); i++ {
+		tagProduk = append(tagProduk, daftarKategori[i].Kategori)
+	}
+
+	seller := Seller{
+		ID:      uint64(produk.Seller.ID),
+		Nama:    produk.Seller.Nama,
+		NomorHp: produk.Seller.NomorHp,
+	}
+
+	return ProdukOutputFormat{
+		NamaProduk: produk.NamaProduk,
+		Slug:       produk.Slug,
+		Harga:      produk.Harga,
+		Diskon:     produk.Diskon,
+		Stok:       produk.Stok,
+		Deskripsi:  produk.Deskripsi,
+		Gender:     produk.Gender,
+		IsHiasan:   produk.IsHiasan,
+		Seller:     seller,
+		Kategori:   kategori.GetKategoriFormatter(&kategoriProduk),
+		Tags:       kategori.GetSemuaKategoriFormatter(&tagProduk),
+	}
+}

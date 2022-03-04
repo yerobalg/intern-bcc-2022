@@ -32,7 +32,11 @@ func (r *ProdukRepository) SaveKategoriProduk(
 
 func (r *ProdukRepository) GetBySlug(slug string) (*Produk, error) {
 	var produk Produk
-	result := r.Conn.Where("slug = ?", slug).First(&produk)
+	result := r.Conn.
+		Preload("Seller").
+		Preload("KategoriProduk").
+		Preload("KategoriProduk.Kategori").
+		First(&produk)
 	return &produk, result.Error
 }
 
