@@ -12,6 +12,7 @@ type ProdukInputFormat struct {
 	Stok       uint     `json:"stok"`
 	Deskripsi  string   `json:"deskripsi"`
 	Gender     string   `json:"gender"`
+	Berat      uint     `json:"berat"`
 	IsHiasan   bool     `json:"isHiasan"`
 	IdKategori uint64   `json:"idKategori"`
 	IdTags     []uint64 `json:"idTags"`
@@ -24,8 +25,9 @@ type ProdukOutputFormat struct {
 	Stok       uint                      `json:"stok"`
 	Deskripsi  string                    `json:"deskripsi"`
 	Gender     string                    `json:"gender"`
+	Berat      uint                      `json:"berat"`
 	IsHiasan   bool                      `json:"isHiasan"`
-	Seller     Seller                    `gorm:"seller"`
+	Seller     Seller                    `json:"seller"`
 	Kategori   kategori.KategoriFormat   `json:"kategori"`
 	Tags       []kategori.KategoriFormat `json:"tags"`
 }
@@ -49,6 +51,7 @@ func ProdukInputFormatter(
 		Stok:       produk.Stok,
 		Deskripsi:  produk.Deskripsi,
 		Gender:     produk.Gender,
+		Berat:      produk.Berat,
 		IsHiasan:   produk.IsHiasan,
 		IdKategori: idKategori,
 		IdTags:     IdTags,
@@ -80,6 +83,7 @@ func ProdukOutputFormatter(
 		Stok:       produk.Stok,
 		Deskripsi:  produk.Deskripsi,
 		Gender:     produk.Gender,
+		Berat:      produk.Berat,
 		IsHiasan:   produk.IsHiasan,
 		Seller:     seller,
 		Kategori:   kategori.GetKategoriFormatter(&kategoriProduk),

@@ -11,10 +11,10 @@ type Alamat struct {
 	Nama          string           `json:"nama" gorm:"type:varchar(50);not null"`
 	AlamatLengkap string           `json:"alamatLengkap" gorm:"type:text;not null"`
 	KodePos       string           `json:"kodePos" gorm:"type:varchar(5);not null;"`
-	IDKelurahan   string           `json:"idKelurahan" gorm:"type:varchar(10);not null"`
+	IDKabupaten   string           `json:"idKabupaten" gorm:"type:varchar(2);not null"`
 	IDUser        uint64           `json:"idUser" gorm:"type:bigint;not null"`
 	IsUser        bool             `gorm:"type:boolean;not null"`
-	Kelurahan     daerah.Kelurahan `gorm:"foreignkey:IDKelurahan;references:IDKel"`
+	Kabupaten     daerah.Kabupaten `gorm:"foreignkey:IDKabupaten;references:IDKab"`
 	User          user.Users       `gorm:"foreignkey:IDUser;references:ID;constraint:OnDelete:CASCADE"`
 }
 
@@ -22,7 +22,7 @@ type AlamatInput struct {
 	Nama          string `json:"nama" binding:"required"`
 	AlamatLengkap string `json:"alamatLengkap" binding:"required"`
 	KodePos       string `json:"kodePos" binding:"required,numeric,len=5"`
-	IDKelurahan   string `json:"idKelurahan" binding:"required"`
+	IDKabupaten   string `json:"idKabupaten" binding:"required"`
 }
 
 func (Alamat) TableName() string {

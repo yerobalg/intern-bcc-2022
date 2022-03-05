@@ -4,24 +4,28 @@ type AlamatInputFormat struct {
 	Nama          string `json:"namaAlamat"`
 	AlamatLengkap string `json:"alamatLengkap"`
 	KodePos       string `json:"kodePos"`
-	IDKelurahan   string `json:"idKelurahan"`
+	IDKabupaten   string `json:"idKabupaten"`
 	AlamatPembeli bool   `json:"alamatPembeli"`
 }
 
 type GetAlamatFormatter struct {
-	ID            uint         `json:"id"`
-	Nama          string       `json:"nama"`
-	AlamatLengkap string       `json:"alamatLengkap"`
-	KodePos       string       `json:"kodePos"`
-	Kelurahan     DaerahFormat `json:"kelurahan"`
-	Kecamatan     DaerahFormat `json:"kecamatan"`
-	KabupatenKota DaerahFormat `json:"kabupatenKota"`
-	Provinsi      DaerahFormat `json:"provinsi"`
+	ID            uint            `json:"id"`
+	Nama          string          `json:"nama"`
+	AlamatLengkap string          `json:"alamatLengkap"`
+	KodePos       string          `json:"kodePos"`
+	KabupatenKota KabupatenFormat `json:"kabupatenKota"`
+	Provinsi      ProvinsiFormat  `json:"provinsi"`
 }
 
-type DaerahFormat struct {
+type ProvinsiFormat struct {
 	ID   string `json:"id"`
 	Nama string `json:"nama"`
+}
+
+type KabupatenFormat struct {
+	ID   string `json:"id"`
+	Nama string `json:"nama"`
+	Tipe string `json:"tipe"`
 }
 
 func AlamatInputFormatter(alamat *Alamat) AlamatInputFormat {
@@ -29,7 +33,7 @@ func AlamatInputFormatter(alamat *Alamat) AlamatInputFormat {
 		Nama:          alamat.Nama,
 		AlamatLengkap: alamat.AlamatLengkap,
 		KodePos:       alamat.KodePos,
-		IDKelurahan:   alamat.IDKelurahan,
+		IDKabupaten:   alamat.IDKabupaten,
 		AlamatPembeli: alamat.IsUser,
 	}
 }
@@ -43,29 +47,20 @@ func GetUserAlamatFormatter(alamat []Alamat) []GetAlamatFormatter {
 }
 
 func GetAlamatByIdFormatter(alamat Alamat) GetAlamatFormatter {
-	kelurahan := DaerahFormat{
-		ID:   alamat.Kelurahan.IDKel,
-		Nama: alamat.Kelurahan.Nama,
+	kabupatenKota := KabupatenFormat{
+		ID:   alamat.Kabupaten.IDKab,
+		Nama: alamat.Kabupaten.Nama,
+		Tipe: alamat.Kabupaten.Tipe,
 	}
-	kecamatan := DaerahFormat{
-		ID:   alamat.Kelurahan.Kecamatan.IDKec,
-		Nama: alamat.Kelurahan.Kecamatan.Nama,
-	}
-	kabupatenKota := DaerahFormat{
-		ID:   alamat.Kelurahan.Kecamatan.Kabupaten.IDKab,
-		Nama: alamat.Kelurahan.Kecamatan.Kabupaten.Nama,
-	}
-	provinsi := DaerahFormat{
-		ID:   alamat.Kelurahan.Kecamatan.Kabupaten.Provinsi.IDProv,
-		Nama: alamat.Kelurahan.Kecamatan.Kabupaten.Provinsi.Nama,
+	provinsi := ProvinsiFormat{
+		ID:   alamat.Kabupaten.Provinsi.IDProv,
+		Nama: alamat.Kabupaten.Provinsi.Nama,
 	}
 	return GetAlamatFormatter{
 		ID:            alamat.ID,
 		Nama:          alamat.Nama,
 		AlamatLengkap: alamat.AlamatLengkap,
 		KodePos:       alamat.KodePos,
-		Kelurahan:     kelurahan,
-		Kecamatan:     kecamatan,
 		KabupatenKota: kabupatenKota,
 		Provinsi:      provinsi,
 	}

@@ -1,7 +1,6 @@
 package daerah
 
 import (
-	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -13,22 +12,10 @@ func NewDaerahRepository(Conn *gorm.DB) DaerahRepository {
 	return DaerahRepository{Conn}
 }
 
-func (r *DaerahRepository) GetDaerah(
-	daerah *[]OutputDaerah,
-	id string,
-	kolomAsal string,
-	kolomTujuan string,
-	tabelTujuan string,
-) error {
-	return r.Conn.Raw(
-		fmt.Sprintf(
-			"SELECT %s AS id, nama FROM %s WHERE %s = ?",
-			kolomAsal,
-			tabelTujuan,
-			kolomTujuan,
-		),
-		id,
-	).Find(&daerah).Error
+func (r *DaerahRepository) GetKabupaten(idProvinsi string) ([]Kabupaten, error) {
+	var kabupaten []Kabupaten
+	res := r.Conn.Where("id_prov = ?", idProvinsi).Find(&kabupaten)
+	return kabupaten, res.Error
 }
 
 func (r *DaerahRepository) GetSemuaProvinsi(provinsi *[]Provinsi) error {

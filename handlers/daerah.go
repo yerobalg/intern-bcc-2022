@@ -5,7 +5,6 @@ import (
 	"clean-arch-2/daerah"
 	"clean-arch-2/middlewares"
 	"clean-arch-2/utilities"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -28,16 +27,7 @@ func (h DaerahHandler) Setup() {
 		api.GET(
 			"/daerah/kabupaten/:idProvinsi",
 			h.middleware.AuthMiddleware(),
-			h.GetDaerah,
-		)
-		api.GET("/daerah/kecamatan/:idKabupaten",
-			h.middleware.AuthMiddleware(),
-			h.GetDaerah,
-		)
-		api.GET(
-			"/daerah/kelurahan/:idKecamatan",
-			h.middleware.AuthMiddleware(),
-			h.GetDaerah,
+			h.GetKabupaten,
 		)
 	}
 }
@@ -74,74 +64,44 @@ func (h DaerahHandler) GetSemuaProvinsi(c *gin.Context) {
 		utilities.ApiResponse(
 			"Berhasil mendapatkan seluruh provinsi",
 			true,
-			&body,
+			daerah.ProvinsiFormat(&body),
 		),
 	)
 }
 
-func (h DaerahHandler) GetDaerah(c *gin.Context) {
-	split := strings.Split(c.Request.URL.Path, "/")
-	paramDaerah := split[4]
-	paramID := split[5]
+func (h DaerahHandler) GetKabupaten(c *gin.Context) {
+	idProvinsi := c.Param("idProvinsi")
 
-	var daerahAsal, daerahTujuan, paramTujuan string
-
-	switch paramDaerah {
-	case "kabupaten":
-		daerahAsal = "kab"
-		daerahTujuan = "prov"
-		paramTujuan = "ID provinsi"
-	case "kecamatan":
-		daerahAsal = "kec"
-		daerahTujuan = "kab"
-		paramTujuan = "ID Kabupaten"
-	case "kelurahan":
-		daerahAsal = "kel"
-		daerahTujuan = "kec"
-		paramTujuan = "ID Kecamatan"
-	}
-
-	daerahAsal = "id_" + daerahAsal
-	daerahTujuan = "id_" + daerahTujuan
-
-	body := []daerah.OutputDaerah{}
-
-	if err := h.service.GetDaerah(
-		&body,
-		paramID,
-		daerahAsal,
-		daerahTujuan,
-		paramDaerah,
-	); err != nil {
-		c.JSON(
-			http.StatusInternalServerError,
-			utilities.ApiResponse(
-				err.Error(),
-				false,
-				nil,
-			),
-		)
-		return
-	}
-
-	if len(body) == 0 {
-		c.JSON(
-			http.StatusNotFound,
-			utilities.ApiResponse(
-				fmt.Sprintf("%s tidak ditemukan", paramTujuan),
-				false,
-				nil,
-			),
-		)
+	res, err := h.service.GetKabupaten(idProvinsi)
+	if err != nil {
+		if strings.Contains(err.Error(), "record not found") {
+			c.JSON(
+				http.StatusNotFound,
+				utilities.ApiResponse(
+					"ID Provinsi Tidak Ditemukan",
+					false,
+					nil,
+				),
+			)
+		} else {
+			c.JSON(
+				http.StatusInternalServerError,
+				utilities.ApiResponse(
+					"Terjadi kesalahan sistem",
+					false,
+					err.Error(),
+				),
+			)
+		}
 		return
 	}
 
 	c.JSON(
 		http.StatusOK,
 		utilities.ApiResponse(
-			fmt.Sprintf("Berhasil mengambil %s", paramDaerah),
+			"Berhasil mendapatkan seluruh kabupaten",
 			true,
-			&body,
+			daerah.KabupatenFormat(&res),
 		),
 	)
 }

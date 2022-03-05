@@ -6,6 +6,7 @@ import (
 	"clean-arch-2/middlewares"
 	"clean-arch-2/produk"
 	"clean-arch-2/utilities"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
 	"net/http"
@@ -47,8 +48,8 @@ func (h ProdukHandler) Setup() {
 		api.DELETE(
 			"/produk/:slug",
 			h.middleware.AuthMiddleware(),
-			h.middleware.RoleMiddleware([]uint64{2}),
-			// h.HapusAlamat,
+			h.middleware.RoleMiddleware([]uint64{3}),
+			h.HapusProduk,
 		)
 		api.GET(
 			"/produk/:slug",
@@ -88,8 +89,7 @@ func (h *ProdukHandler) TambahProduk(c *gin.Context) {
 		return
 	}
 
-
-	if (len(body.IdTags) == 0) { 
+	if len(body.IdTags) == 0 {
 		c.JSON(
 			http.StatusBadRequest,
 			utilities.ApiResponse(
@@ -111,6 +111,7 @@ func (h *ProdukHandler) TambahProduk(c *gin.Context) {
 		IDSeller:   userId,
 		IsHiasan:   body.IsHiasan,
 		Gender:     body.Gender,
+		Berat:      body.Berat,
 	}
 
 	idTags := body.IdTags
@@ -151,6 +152,7 @@ func (h *ProdukHandler) TambahProduk(c *gin.Context) {
 
 func (h *ProdukHandler) UbahProduk(c *gin.Context) {
 	slug, _ := c.Params.Get("slug")
+	fmt.Println(slug)
 	var body produk.ProdukInput
 	if err := c.BindJSON(&body); err != nil {
 		c.JSON(
@@ -188,6 +190,7 @@ func (h *ProdukHandler) UbahProduk(c *gin.Context) {
 		return
 	}
 
+
 	res.NamaProduk = body.NamaProduk
 	res.Harga = body.Harga
 	res.Diskon = body.Diskon
@@ -195,6 +198,7 @@ func (h *ProdukHandler) UbahProduk(c *gin.Context) {
 	res.Deskripsi = body.Deskripsi
 	res.IsHiasan = body.IsHiasan
 	res.Gender = body.Gender
+	res.Berat = body.Berat
 
 	idTags := body.IdTags
 	idTags2 := append(idTags, body.IDKategori)
@@ -214,7 +218,7 @@ func (h *ProdukHandler) UbahProduk(c *gin.Context) {
 	c.JSON(
 		http.StatusOK,
 		utilities.ApiResponse(
-			"Produk berhasil ditambahkan",
+			"Produk berhasil diubah",
 			true,
 			produk.ProdukInputFormatter(res, body.IDKategori, idTags),
 		),
@@ -226,14 +230,25 @@ func (h *ProdukHandler) GetProdukBySlug(c *gin.Context) {
 
 	res, err := h.service.GetBySlug(slug)
 	if err != nil {
-		c.JSON(
-			http.StatusInternalServerError,
-			utilities.ApiResponse(
-				"Terjadi kesalahan sistem",
-				false,
-				err.Error(),
-			),
-		)
+		if strings.Contains(err.Error(), "record not found") {
+			c.JSON(
+				http.StatusNotFound,
+				utilities.ApiResponse(
+					"Produk tidak ditemukan",
+					false,
+					err.Error(),
+				),
+			)
+		} else {
+			c.JSON(
+				http.StatusInternalServerError,
+				utilities.ApiResponse(
+					"Terjadi kesalahan Sistem",
+					false,
+					err.Error(),
+				),
+			)
+		}
 		return
 	}
 
@@ -248,5 +263,51 @@ func (h *ProdukHandler) GetProdukBySlug(c *gin.Context) {
 }
 
 func (h *ProdukHandler) HapusProduk(c *gin.Context) {
-	//slug, _ := c.Params.Get("slug")
+	slug, _ := c.Params.Get("slug")
+
+	res, err := h.service.GetBySlug(slug)
+	if err != nil {
+		if strings.Contains(err.Error(), "record not found") {
+			c.JSON(
+				http.StatusNotFound,
+				utilities.ApiResponse(
+					"Produk tidak ditemukan",
+					false,
+					err.Error(),
+				),
+			)
+		} else {
+			c.JSON(
+				http.StatusInternalServerError,
+				utilities.ApiResponse(
+					"Terjadi kesalahan Sistem",
+					false,
+					err.Error(),
+				),
+			)
+		}
+		return
+	}
+
+	if err := h.service.Delete(res); err != nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			utilities.ApiResponse(
+				"Terjadi kesalahan sistem",
+				false,
+				err.Error(),
+			),
+		)
+		return
+	}
+
+	c.JSON(
+		http.StatusOK,
+		utilities.ApiResponse(
+			"Produk berhasil dihapus",
+			true,
+			produk.ProdukOutputFormatter(*res),
+		),
+	)
+
 }

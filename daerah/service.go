@@ -8,16 +8,10 @@ func NewDaerahService(daerahRepo DaerahRepository) DaerahService {
 	return DaerahService{repo: daerahRepo}
 }
 
-func (r *DaerahService) GetDaerah(
-	daerah *[]OutputDaerah,
-	id string,
-	kolomAsal string,
-	kolomTujuan string,
-	tabelTujuan string,
-) error {
-	return r.repo.GetDaerah(daerah, id, kolomAsal, kolomTujuan, tabelTujuan)
+func (s *DaerahService) GetSemuaProvinsi(provinsi *[]Provinsi) error {
+	return s.repo.GetSemuaProvinsi(provinsi)
 }
 
-func (r *DaerahService) GetSemuaProvinsi(provinsi *[]Provinsi) error {
-	return r.repo.GetSemuaProvinsi(provinsi)
+func (s *DaerahService) GetKabupaten(idProvinsi string) ([]Kabupaten, error) {
+	return s.repo.GetKabupaten(idProvinsi)
 }

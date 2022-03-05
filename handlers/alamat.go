@@ -121,7 +121,7 @@ func (h *AlamatHandler) TambahAlamat(c *gin.Context) {
 		Nama:          body.Nama,
 		AlamatLengkap: body.AlamatLengkap,
 		KodePos:       body.KodePos,
-		IDKelurahan:   body.IDKelurahan,
+		IDKabupaten:   body.IDKabupaten,
 		IDUser:        userId,
 		IsUser:        roleId == 2,
 	}
@@ -210,7 +210,7 @@ func (h *AlamatHandler) UbahAlamat(c *gin.Context) {
 	res.Nama = body.Nama
 	res.AlamatLengkap = body.AlamatLengkap
 	res.KodePos = body.KodePos
-	res.IDKelurahan = body.IDKelurahan
+	res.IDKabupaten = body.IDKabupaten
 
 	if err := h.service.Update(res); err != nil {
 		c.JSON(

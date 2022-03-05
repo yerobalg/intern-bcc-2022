@@ -13,11 +13,12 @@ type Produk struct {
 	Harga          uint64            `json:"harga" gorm:"type:bigint;not null"`
 	Diskon         float64           `json:"diskon" gorm:"type:double precision;default:0.0"`
 	Stok           uint              `json:"stok" gorm:"type:int;not null"`
+	Berat          uint              `json:"berat" gorm:"type:int;not null"`
 	Deskripsi      string            `json:"deskripsi" gorm:"type:text;not null"`
 	IDSeller       uint64            `json:"idSeller" gorm:"type:bigint;not null;column:id_seller"`
 	IsHiasan       bool              `json:"isHiasan" gorm:"type:boolean;not null"`
 	Gender         string            `json:"gender" gorm:"type:varchar(10);"`
-	Seller         user.Users        `gorm:"foreignkey:IDSeller;references:ID;constraint:OnDelete:CASCADE"`
+	Seller         user.Users        `json:"seller" gorm:"foreignkey:IDSeller;references:ID;constraint:OnDelete:CASCADE"`
 	KategoriProduk []Kategori_Produk `gorm:"foreignkey:IDProduk"`
 }
 
@@ -35,6 +36,7 @@ type ProdukInput struct {
 	Deskripsi  string   `json:"deskripsi" binding:"required"`
 	Diskon     float64  `json:"diskon"`
 	Gender     string   `json:"gender"`
+	Berat      uint     `json:"berat"`
 	IsHiasan   bool     `json:"isHiasan"`
 	IDKategori uint64   `json:"idKategori"`
 	IdTags     []uint64 `json:"idTags"`

@@ -40,6 +40,7 @@ func (r *ProdukRepository) GetBySlug(slug string) (*Produk, error) {
 		Preload("Seller").
 		Preload("KategoriProduk").
 		Preload("KategoriProduk.Kategori").
+		Where("slug = ?", slug).
 		First(&produk)
 	return &produk, result.Error
 }
