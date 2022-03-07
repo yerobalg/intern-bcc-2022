@@ -25,7 +25,7 @@ func (r *AlamatRepository) GetById(id uint64) (alamat *Alamat, err error) {
 
 	result := r.Conn.
 		Preload("Kabupaten").
-		Preload("Kelurahan.Provinsi").
+		Preload("Kabupaten.Provinsi").
 		Where("id = ?", id).
 		First(&alamatObj)
 	return alamatObj, result.Error
@@ -39,7 +39,7 @@ func (r *AlamatRepository) GetAllUserAddress(idUser uint64) ([]Alamat, error) {
 	alamatList := []Alamat{}
 	result := r.Conn.
 		Preload("Kabupaten").
-		Preload("Kelurahan.Provinsi").
+		Preload("Kabupaten.Provinsi").
 		Where("id_user = ?", idUser).
 		Find(&alamatList)
 	return alamatList, result.Error

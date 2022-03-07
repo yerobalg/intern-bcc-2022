@@ -7,7 +7,7 @@ import (
 	"clean-arch-2/utilities"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"strings"
+	//"strings"
 )
 
 type DaerahHandler struct {
@@ -74,25 +74,26 @@ func (h DaerahHandler) GetKabupaten(c *gin.Context) {
 
 	res, err := h.service.GetKabupaten(idProvinsi)
 	if err != nil {
-		if strings.Contains(err.Error(), "record not found") {
-			c.JSON(
-				http.StatusNotFound,
-				utilities.ApiResponse(
-					"ID Provinsi Tidak Ditemukan",
-					false,
-					nil,
-				),
-			)
-		} else {
-			c.JSON(
-				http.StatusInternalServerError,
-				utilities.ApiResponse(
-					"Terjadi kesalahan sistem",
-					false,
-					err.Error(),
-				),
-			)
-		}
+		c.JSON(
+			http.StatusInternalServerError,
+			utilities.ApiResponse(
+				"Terjadi kesalahan sistem",
+				false,
+				err.Error(),
+			),
+		)
+		return
+	}
+
+	if len(res) == 0 {
+		c.JSON(
+			http.StatusNotFound,
+			utilities.ApiResponse(
+				"ID Provinsi tidak ditemukan",
+				false,
+				nil,
+			),
+		)
 		return
 	}
 

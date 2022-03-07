@@ -10,6 +10,7 @@ import (
 	"clean-arch-2/alamat"
 	"clean-arch-2/kategori"
 	"clean-arch-2/produk"
+	"clean-arch-2/keranjang"
 	"github.com/gin-gonic/gin"
 )
 
@@ -76,6 +77,18 @@ func main() {
 		middleware,
 	)
 
+	//init keranjang
+	keranjangRepo := keranjang.NewKeranjangRepository(db)
+	keranjangService := keranjang.NewKeranjangService(keranjangRepo)
+	keranjangHandler := handlers.NewKeranjangHandler(
+		router,
+		keranjangService,
+		userService,
+		alamatService, 
+		produkService, 
+		middleware,
+	)
+
 	//setup router
 	handlers.NewHandlers(
 		authHandler,
@@ -83,6 +96,7 @@ func main() {
 		alamatHandler,
 		kategoriHandler,
 		produkHandler,
+		keranjangHandler,
 	).Setup()
 
 	router.Gin.Run()

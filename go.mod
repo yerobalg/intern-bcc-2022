@@ -3,6 +3,7 @@ module clean-arch-2
 go 1.17
 
 require (
+	github.com/Bhinneka/go-rajaongkir v0.0.0-20180209093955-b24cf6077786 // indirect
 	github.com/gin-contrib/cors v1.3.1 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.7.7 // indirect

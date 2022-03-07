@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"fmt"
 )
 
 type AlamatHandler struct {
@@ -103,6 +104,8 @@ func (h *AlamatHandler) TambahAlamat(c *gin.Context) {
 			)
 			return
 		}
+
+		fmt.Println("tes")
 
 		if len(res) > 0 {
 			c.JSON(
