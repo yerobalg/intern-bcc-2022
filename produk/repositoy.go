@@ -30,6 +30,20 @@ func (r *ProdukRepository) SaveKategoriProduk(
 	return r.Conn.Create(&kategoriProduk).Error
 }
 
+func (r *ProdukRepository) SaveGambarProduk(
+	idProduk uint64,
+	nama []string,
+) error {
+	var gambarProduk []Gambar_Produk
+	for _, n := range nama {
+		gambarProduk = append(gambarProduk, Gambar_Produk{
+			IDProduk: idProduk,
+			Nama:     n,
+		})
+	}
+	return r.Conn.Create(&gambarProduk).Error
+}
+
 func (r *ProdukRepository) DeleteKategoriProduk(idProduk uint64) error {
 	return r.Conn.Where("id_produk = ?", idProduk).Delete(&Kategori_Produk{}).Error
 }
@@ -37,7 +51,6 @@ func (r *ProdukRepository) DeleteKategoriProduk(idProduk uint64) error {
 func (r *ProdukRepository) GetBySlug(slug string) (*Produk, error) {
 	var produk Produk
 	result := r.Conn.
-		Preload("Seller").
 		Preload("KategoriProduk").
 		Preload("KategoriProduk.Kategori").
 		Where("slug = ?", slug).

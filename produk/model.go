@@ -19,6 +19,15 @@ type Produk struct {
 	KategoriProduk []Kategori_Produk `gorm:"foreignkey:IDProduk"`
 }
 
+type Gambar_Produk struct {
+	IDProduk uint64 `json:"id_produk" gorm:"type:bigint;not null"`
+	Nama     string `json:"nama" gorm:"type:varchar(100);not null"`
+	Produk   Produk `gorm:"foreignkey:IDProduk;references:ID;constraint:OnDelete:CASCADE"`
+}
+
+func (Gambar_Produk) TableName() string {
+	return "gambar_produk"
+}
 type Kategori_Produk struct {
 	IDProduk   uint64            `json:"idProduk" gorm:"type:bigint;"`
 	IDKategori uint64            `json:"idKategori" gorm:"type:bigint;"`

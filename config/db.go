@@ -38,6 +38,7 @@ func InitDB() (*gorm.DB, error) {
 		&kategori.Kategori{},	
 		&produk.Produk{},
 		&produk.Kategori_Produk{},
+		&produk.Gambar_Produk{},
 		&keranjang.Keranjang{},
 		&keranjang.Keranjang_Produk{},
 	)

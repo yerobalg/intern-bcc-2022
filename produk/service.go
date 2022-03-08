@@ -17,6 +17,13 @@ func (s *ProdukService) Save(produk *Produk, idKategori []uint64) error {
 	return err
 }
 
+func (s *ProdukService) SaveGambar(
+	idProduk uint64,
+	nama []string,
+) error {
+	return s.repo.SaveGambarProduk(idProduk, nama)
+}
+
 func (s *ProdukService) GetBySlug(slug string) (*Produk, error) {
 	return s.repo.GetBySlug(slug)
 }
@@ -26,9 +33,9 @@ func (s *ProdukService) GetBySlug(slug string) (*Produk, error) {
 // }
 
 func (s *ProdukService) Update(
-	produk *Produk, 
-	idKategori[] uint64,
-	) error {
+	produk *Produk,
+	idKategori []uint64,
+) error {
 	if err := s.repo.Update(produk); err != nil {
 		return err
 	}

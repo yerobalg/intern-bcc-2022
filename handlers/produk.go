@@ -9,7 +9,11 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
+	// "io"
+	//"log"
+	"os"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -54,6 +58,12 @@ func (h ProdukHandler) Setup() {
 		api.GET(
 			"/produk/:slug",
 			h.GetProdukBySlug,
+		)
+		api.POST(
+			"produk/gambar/:slug",
+			h.middleware.AuthMiddleware(),
+			h.middleware.RoleMiddleware([]uint64{1}),
+			h.TambahGambarProduk,
 		)
 	}
 }
@@ -186,7 +196,6 @@ func (h *ProdukHandler) UbahProduk(c *gin.Context) {
 		return
 	}
 
-
 	res.NamaProduk = body.NamaProduk
 	res.Harga = body.Harga
 	res.Diskon = body.Diskon
@@ -305,5 +314,84 @@ func (h *ProdukHandler) HapusProduk(c *gin.Context) {
 			produk.ProdukOutputFormatter(*res),
 		),
 	)
-
 }
+
+func (h *ProdukHandler) TambahGambarProduk(c *gin.Context) {
+	slug, _ := c.Params.Get("slug")
+	res, err := h.service.GetBySlug(slug)
+	if err != nil {
+		if strings.Contains(err.Error(), "record not found") {
+			c.JSON(
+				http.StatusNotFound,
+				utilities.ApiResponse(
+					"Produk tidak ditemukan",
+					false,
+					err.Error(),
+				),
+			)
+		} else {
+			c.JSON(
+				http.StatusInternalServerError,
+				utilities.ApiResponse(
+					"Terjadi kesalahan Sistem",
+					false,
+					err.Error(),
+				),
+			)
+		}
+		return
+	}
+
+	//Multiple Form
+	form, err := c.MultipartForm()
+	if err != nil {
+		panic(err)
+	}
+	files := form.File["gambar"]
+
+	var url []string
+
+	// For range
+	for i, file := range files {
+		path := fmt.Sprintf(
+			"public/images/products/%s_%s.%s",
+			strconv.Itoa(i+1),
+			slug,
+			strings.Split(file.Filename, ".")[1],
+		)
+		if err := c.SaveUploadedFile(file, path); err != nil {
+			c.String(http.StatusBadRequest, fmt.Sprintf("err: %s", err.Error()))
+			return
+		}
+		url = append(url, path)
+	}
+
+	err = h.service.SaveGambar(uint64(res.ID), url)
+	if err != nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			utilities.ApiResponse(
+				"Terjadi kesalahan sistem",
+				false,
+				err.Error(),
+			),
+		)
+		return
+	}
+
+	for i := 0; i < len(url); i++ {
+		url[i] = os.Getenv("BASE_URL") + "/" + url[i]
+	}
+
+	// Response
+	c.JSON(
+		http.StatusOK,
+		utilities.ApiResponse(
+			"Berhasil Mengupload Gambar", 
+			true, 
+			gin.H{"gambar": url},
+		),
+	)
+}
+
+

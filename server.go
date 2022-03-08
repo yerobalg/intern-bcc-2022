@@ -24,8 +24,14 @@ func main() {
 	//load .env server
 	config.Init(".server")
 
+	// engine := gin.Default()
+	// engine.Static("/public/images/products", "./public/images/products")
+
 	//init router
 	router := config.NewRouter(gin.Default())
+	router.Gin.Static("/public/images/users", "./public/images/users")
+	router.Gin.Static("/public/images/products", "./public/images/products")
+
 	//init middleware
 	middleware := middlewares.Middleware{}
 	// roleMiddleware := middlewares.RoleMiddleware{}
