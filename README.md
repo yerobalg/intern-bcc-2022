@@ -7,3 +7,4 @@ Kelompok 16
 3. langkapi file env.server dan env.database. Jika sudah, rename dan tambahkan tanda titik di depan, menjadi .env.server dan .env.database
 4. Setelah sudah, run server.
 5. Jalankan seeder2.sql
+6. Server siap digunakan
