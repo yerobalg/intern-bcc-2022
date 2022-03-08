@@ -17,6 +17,7 @@ type Produk struct {
 	IsHiasan       bool              `json:"isHiasan" gorm:"type:boolean;not null"`
 	Gender         string            `json:"gender" gorm:"type:varchar(10);"`
 	KategoriProduk []Kategori_Produk `gorm:"foreignkey:IDProduk"`
+	GambarProduk   []Gambar_Produk   `gorm:"foreignkey:IDProduk"`
 }
 
 type Gambar_Produk struct {
@@ -28,6 +29,7 @@ type Gambar_Produk struct {
 func (Gambar_Produk) TableName() string {
 	return "gambar_produk"
 }
+
 type Kategori_Produk struct {
 	IDProduk   uint64            `json:"idProduk" gorm:"type:bigint;"`
 	IDKategori uint64            `json:"idKategori" gorm:"type:bigint;"`

@@ -1,17 +1,18 @@
 package main
 
 import (
+	"clean-arch-2/alamat"
 	"clean-arch-2/config"
+	"clean-arch-2/daerah"
 	"clean-arch-2/handlers"
+	"clean-arch-2/kategori"
+	"clean-arch-2/keranjang"
 	"clean-arch-2/middlewares"
+	"clean-arch-2/produk"
 	"clean-arch-2/role"
 	"clean-arch-2/user"
-	"clean-arch-2/daerah"
-	"clean-arch-2/alamat"
-	"clean-arch-2/kategori"
-	"clean-arch-2/produk"
-	"clean-arch-2/keranjang"
 	"github.com/gin-gonic/gin"
+	"os"
 )
 
 func main() {
@@ -90,8 +91,8 @@ func main() {
 		router,
 		keranjangService,
 		userService,
-		alamatService, 
-		produkService, 
+		alamatService,
+		produkService,
 		middleware,
 	)
 
@@ -105,5 +106,5 @@ func main() {
 		keranjangHandler,
 	).Setup()
 
-	router.Gin.Run()
+	router.Gin.Run(":" + os.Getenv("PORT"))
 }

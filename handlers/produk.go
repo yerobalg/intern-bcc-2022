@@ -11,8 +11,8 @@ import (
 	"github.com/gosimple/slug"
 	// "io"
 	//"log"
-	"os"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -64,6 +64,12 @@ func (h ProdukHandler) Setup() {
 			h.middleware.AuthMiddleware(),
 			h.middleware.RoleMiddleware([]uint64{1}),
 			h.TambahGambarProduk,
+		)
+		api.DELETE(
+			"produk/gambar/:slug/:namaGambar",
+			h.middleware.AuthMiddleware(),
+			h.middleware.RoleMiddleware([]uint64{1}),
+			h.HapusGambarProduk,
 		)
 	}
 }
@@ -387,11 +393,74 @@ func (h *ProdukHandler) TambahGambarProduk(c *gin.Context) {
 	c.JSON(
 		http.StatusOK,
 		utilities.ApiResponse(
-			"Berhasil Mengupload Gambar", 
-			true, 
+			"Berhasil Mengupload Gambar",
+			true,
 			gin.H{"gambar": url},
 		),
 	)
 }
 
+func (h *ProdukHandler) HapusGambarProduk(c *gin.Context) {
+	slug, _ := c.Params.Get("slug")
+	namaGambar, _ := c.Params.Get("namaGambar")
 
+	res, err := h.service.GetBySlug(slug)
+	if err != nil {
+		if strings.Contains(err.Error(), "record not found") {
+			c.JSON(
+				http.StatusNotFound,
+				utilities.ApiResponse(
+					"Produk tidak ditemukan",
+					false,
+					err.Error(),
+				),
+			)
+		} else {
+			c.JSON(
+				http.StatusInternalServerError,
+				utilities.ApiResponse(
+					"Terjadi kesalahan Sistem",
+					false,
+					err.Error(),
+				),
+			)
+		}
+		return
+	}
+	// dir := os.Getenv("SERVER_PATH") + "/public/images/products/" + namaGambar
+	dir := "../public/images/products/" + namaGambar
+	if err := os.Remove(dir); err != nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			utilities.ApiResponse(
+				"Terjadi kesalahan Sistem",
+				false,
+				err.Error(),
+			),
+		)
+		return
+	}
+
+	err = h.service.DeleteGambarProduk(uint64(res.ID), namaGambar)
+	if err != nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			utilities.ApiResponse(
+				"Terjadi kesalahan Sistem",
+				false,
+				err.Error(),
+			),
+		)
+		return
+	}
+
+	c.JSON(
+		http.StatusOK,
+		utilities.ApiResponse(
+			"Berhasil Menghapus Gambar",
+			true,
+			nil,
+		),
+	)
+
+}

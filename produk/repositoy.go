@@ -52,6 +52,7 @@ func (r *ProdukRepository) GetBySlug(slug string) (*Produk, error) {
 	var produk Produk
 	result := r.Conn.
 		Preload("KategoriProduk").
+		Preload("GambarProduk").
 		Preload("KategoriProduk.Kategori").
 		Where("slug = ?", slug).
 		First(&produk)
@@ -101,4 +102,19 @@ func (r *ProdukRepository) Update(prod *Produk) error {
 
 func (r *ProdukRepository) Delete(produk *Produk) error {
 	return r.Conn.Delete(produk).Error
+}
+
+func (r *ProdukRepository) DeleteGambarProduk(
+	idProduk uint64,
+	nama string,
+) error {
+	gambar := &Gambar_Produk {
+		IDProduk: idProduk,
+		Nama: nama,
+	}
+	return r.Conn.Raw(
+		`DELETE FEOM gambar_produk WHERE id_produk = ? AND nama = ?`,
+		idProduk,
+		nama,
+	).Scan(&gambar).Error
 }
