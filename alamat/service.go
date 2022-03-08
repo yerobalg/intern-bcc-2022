@@ -27,3 +27,7 @@ func (s AlamatService) Delete(alamat *Alamat) error {
 func (s AlamatService) GetAllUserAddress(idUser uint64) ([]Alamat, error) {
 	return s.repo.GetAllUserAddress(idUser)
 }
+
+func (s AlamatService) GetAdminAddress() (Alamat, error) {
+	return s.repo.GetAdminAddress()
+}

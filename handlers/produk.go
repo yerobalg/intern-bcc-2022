@@ -27,7 +27,7 @@ func (h ProdukHandler) Setup() {
 		api.POST(
 			"/produk",
 			h.middleware.AuthMiddleware(),
-			h.middleware.RoleMiddleware([]uint64{3}),
+			h.middleware.RoleMiddleware([]uint64{1}),
 			h.TambahProduk,
 		)
 		api.GET(
@@ -42,13 +42,13 @@ func (h ProdukHandler) Setup() {
 		api.PUT(
 			"/produk/:slug",
 			h.middleware.AuthMiddleware(),
-			h.middleware.RoleMiddleware([]uint64{3}),
+			h.middleware.RoleMiddleware([]uint64{1}),
 			h.UbahProduk,
 		)
 		api.DELETE(
 			"/produk/:slug",
 			h.middleware.AuthMiddleware(),
-			h.middleware.RoleMiddleware([]uint64{3}),
+			h.middleware.RoleMiddleware([]uint64{1}),
 			h.HapusProduk,
 		)
 		api.GET(
@@ -73,9 +73,6 @@ func NewProdukHandler(
 }
 
 func (h *ProdukHandler) TambahProduk(c *gin.Context) {
-	userIdInterface, _ := c.Get("userId")
-	userId := uint64(userIdInterface.(float64))
-
 	var body produk.ProdukInput
 	if err := c.BindJSON(&body); err != nil {
 		c.JSON(
@@ -108,7 +105,6 @@ func (h *ProdukHandler) TambahProduk(c *gin.Context) {
 		Diskon:     body.Diskon,
 		Stok:       body.Stok,
 		Deskripsi:  body.Deskripsi,
-		IDSeller:   userId,
 		IsHiasan:   body.IsHiasan,
 		Gender:     body.Gender,
 		Berat:      body.Berat,

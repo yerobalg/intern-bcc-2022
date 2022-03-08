@@ -21,9 +21,9 @@ func (s *ProdukService) GetBySlug(slug string) (*Produk, error) {
 	return s.repo.GetBySlug(slug)
 }
 
-func (s *ProdukService) GetByIdSeller(idSeller uint64) (*[]Produk, error) {
-	return s.repo.GetByIdSeller(idSeller)
-}
+// func (s *ProdukService) GetByIdSeller(idSeller uint64) (*[]Produk, error) {
+// 	return s.repo.GetByIdSeller(idSeller)
+// }
 
 func (s *ProdukService) Update(
 	produk *Produk, 

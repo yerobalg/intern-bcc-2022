@@ -6,11 +6,12 @@ import (
 	"clean-arch-2/middlewares"
 	"clean-arch-2/role"
 	"clean-arch-2/utilities"
-	"github.com/gin-gonic/gin"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
-	"fmt"
+
+	"github.com/gin-gonic/gin"
 )
 
 type AlamatHandler struct {
@@ -27,7 +28,7 @@ func (h AlamatHandler) Setup() {
 		api.POST(
 			"/alamat",
 			h.middleware.AuthMiddleware(),
-			h.middleware.RoleMiddleware([]uint64{2, 3}),
+			h.middleware.RoleMiddleware([]uint64{1, 2}),
 			h.TambahAlamat,
 		)
 		api.GET(
@@ -52,8 +53,8 @@ func (h AlamatHandler) Setup() {
 			h.HapusAlamat,
 		)
 		api.GET(
-			"/alamat/seller/:idSeller",
-			h.GetAlamatSeller,
+			"/alamat/admin",
+			h.GetAlamatAdmin,
 		)
 	}
 }
@@ -91,7 +92,7 @@ func (h *AlamatHandler) TambahAlamat(c *gin.Context) {
 		return
 	}
 
-	if roleId == 3 {
+	if roleId == 1 {
 		res, err := h.service.GetAllUserAddress(userId)
 		if err != nil {
 			c.JSON(
@@ -111,7 +112,7 @@ func (h *AlamatHandler) TambahAlamat(c *gin.Context) {
 			c.JSON(
 				http.StatusBadRequest,
 				utilities.ApiResponse(
-					"Seller sudah memiliki alamat",
+					"Admin sudah memiliki alamat",
 					false,
 					nil,
 				),
@@ -273,7 +274,7 @@ func (h *AlamatHandler) HapusAlamat(c *gin.Context) {
 		c.JSON(
 			http.StatusForbidden,
 			utilities.ApiResponse(
-				"Anda tidak memiliki akses untuk mengubah alamat ini",
+				"Anda tidak memiliki akses untuk menghapus alamat ini",
 				false,
 				nil,
 			),
@@ -385,11 +386,8 @@ func (h *AlamatHandler) GetAlamatById(c *gin.Context) {
 	)
 }
 
-func (h *AlamatHandler) GetAlamatSeller(c *gin.Context) {
-	idRaw, _ := c.Params.Get("idSeller")
-	id, _ := strconv.ParseUint(idRaw, 10, 64)
-
-	res, err := h.service.GetAllUserAddress(id)
+func (h *AlamatHandler) GetAlamatAdmin(c *gin.Context) {
+	res, err := h.service.GetAdminAddress()
 
 	if err != nil {
 		c.JSON(
@@ -403,26 +401,12 @@ func (h *AlamatHandler) GetAlamatSeller(c *gin.Context) {
 		return
 	}
 
-	alamatSeller := res[0]
-
-	if (alamatSeller.IsUser) {
-		c.JSON(
-			http.StatusNotFound,
-			utilities.ApiResponse(
-				"Alamat tidak ditemukan",
-				false,
-				nil,
-			),
-		)
-		return
-	}
-
 	c.JSON(
 		http.StatusOK,
 		utilities.ApiResponse(
-			"Alamat Seller berhasil diambil",
+			"Alamat Admin berhasil diambil",
 			true,
-			alamat.GetAlamatByIdFormatter(alamatSeller),
+			alamat.GetAlamatByIdFormatter(res),
 		),
 	)
 }

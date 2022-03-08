@@ -45,11 +45,11 @@ func (r *ProdukRepository) GetBySlug(slug string) (*Produk, error) {
 	return &produk, result.Error
 }
 
-func (r *ProdukRepository) GetByIdSeller(idSeller uint64) (*[]Produk, error) {
-	var produk []Produk
-	result := r.Conn.Where("id_seller = ?", idSeller).Find(&produk)
-	return &produk, result.Error
-}
+// func (r *ProdukRepository) GetByIdSeller(idSeller uint64) (*[]Produk, error) {
+// 	var produk []Produk
+// 	result := r.Conn.Where("id_seller = ?", idSeller).Find(&produk)
+// 	return &produk, result.Error
+// }
 
 func (r *ProdukRepository) Update(prod *Produk) error {
 	return r.Conn.Raw(
@@ -66,7 +66,6 @@ func (r *ProdukRepository) Update(prod *Produk) error {
 				"diskon" = ?, 
 				"stok" = ?, 
 				"deskripsi" = ?, 
-				"id_seller" = ?, 
 				"is_hiasan" = ?, 
 				"gender" = ? 
 			WHERE 
@@ -81,7 +80,6 @@ func (r *ProdukRepository) Update(prod *Produk) error {
 		prod.Diskon,
 		prod.Stok,
 		prod.Deskripsi,
-		prod.IDSeller,
 		prod.IsHiasan,
 		prod.Gender,
 		prod.ID,

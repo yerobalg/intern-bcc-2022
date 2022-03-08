@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"clean-arch-2/config"
-	"clean-arch-2/user"
 	"clean-arch-2/role"
+	"clean-arch-2/user"
 	"clean-arch-2/utilities"
 	"fmt"
 	"net/http"
@@ -13,8 +13,8 @@ import (
 )
 
 type AuthHandler struct {
-	handler config.Router
-	service user.UserService
+	handler     config.Router
+	service     user.UserService
 	roleService role.RoleService
 }
 
@@ -32,8 +32,8 @@ func NewAuthHandler(
 	roleService role.RoleService,
 ) AuthHandler {
 	return AuthHandler{
-		handler: handler, 
-		service: service, 
+		handler:     handler,
+		service:     service,
 		roleService: roleService,
 	}
 }
@@ -213,7 +213,7 @@ func (h AuthHandler) Register(c *gin.Context) {
 		JenisKelamin: body.JenisKelamin,
 		NomorHp:      body.NomorHp,
 		Nama:         body.Nama,
-		RoleID:       body.RoleID,
+		RoleID:       2,
 	}
 
 	if err := h.service.Register(&userObj); err != nil {

@@ -7,8 +7,8 @@ import (
 
 type Users struct {
 	gorm.Model
-	Username     string `json:"username" gorm:"type:varchar(100);not null;unique"`
-	Email        string `json:"email" gorm:"type:varchar(100);not null;unique"`
+	Username     string `json:"username" gorm:"type:varchar(100);unique;not null;size:256"`
+	Email        string `json:"email" gorm:"type:varchar(100);unique;not null;size:256"`
 	Password     string `gorm:"type:text;not null"`
 	Nama         string `json:"nama" gorm:"type:varchar(255);not null"`
 	JenisKelamin bool   `json:"jenisKelamin" gorm:"type:boolean;not null"`
@@ -23,7 +23,6 @@ type UserRegisterInput struct {
 	Password     string `json:"password" binding:"required,min=6,max=20"`
 	Nama         string `json:"nama" binding:"required"`
 	NomorHp      string `json:"nomorHP" binding:"required,numeric"`
-	RoleID 		   uint64 `json:"roleID" binding:"required"`
 	JenisKelamin bool   `json:"jenisKelamin" binding:"required"`
 }
 

@@ -27,7 +27,6 @@ type ProdukOutputFormat struct {
 	Gender     string                    `json:"gender"`
 	Berat      uint                      `json:"berat"`
 	IsHiasan   bool                      `json:"isHiasan"`
-	Seller     Seller                    `json:"seller"`
 	Kategori   kategori.KategoriFormat   `json:"kategori"`
 	Tags       []kategori.KategoriFormat `json:"tags"`
 }
@@ -69,12 +68,6 @@ func ProdukOutputFormatter(
 		tagProduk = append(tagProduk, daftarKategori[i].Kategori)
 	}
 
-	seller := Seller{
-		ID:      uint64(produk.Seller.ID),
-		Nama:    produk.Seller.Nama,
-		NomorHp: produk.Seller.NomorHp,
-	}
-
 	return ProdukOutputFormat{
 		NamaProduk: produk.NamaProduk,
 		Slug:       produk.Slug,
@@ -85,7 +78,6 @@ func ProdukOutputFormatter(
 		Gender:     produk.Gender,
 		Berat:      produk.Berat,
 		IsHiasan:   produk.IsHiasan,
-		Seller:     seller,
 		Kategori:   kategori.GetKategoriFormatter(&kategoriProduk),
 		Tags:       kategori.GetSemuaKategoriFormatter(&tagProduk),
 	}

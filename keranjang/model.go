@@ -1,8 +1,8 @@
 package keranjang
 
 import (
-	"gorm.io/gorm"
 	"clean-arch-2/user"
+	"gorm.io/gorm"
 )
 
 type InputKeranjang struct {
@@ -13,9 +13,9 @@ type InputKeranjang struct {
 
 type Keranjang struct {
 	gorm.Model
-	IDUser   uint64 `json:"idUser" gorm:"type:bigint;not null"`
-	IDSeller uint64 `json:"idseller" gorm:"type:bigint;not null"` 
-	User user.Users `json:"user" gorm:"foreignkey:IDUser"`
+	IDUser uint64             `json:"idUser" gorm:"type:bigint;not null"`
+	User   user.Users         `json:"user" gorm:"foreignkey:IDUser"`
+	Produk []Keranjang_Produk `gorm:"foreignkey:IDKeranjang;"`
 }
 
 func (Keranjang) TableName() string {
@@ -30,5 +30,5 @@ type Keranjang_Produk struct {
 }
 
 func (Keranjang_Produk) TableName() string {
-	return "keranjang_roduk"
+	return "keranjang_produk"
 }

@@ -41,27 +41,6 @@ func (h KeranjangHandler) Setup() {
 			h.middleware.AuthMiddleware(),
 			h.middleware.RoleMiddleware([]uint64{2}),
 		)
-		// api.GET(
-		// 	"/alamat/:idAlamat",
-		// 	h.middleware.AuthMiddleware(),
-		// 	h.GetAlamatById,
-		// )
-		// api.PUT(
-		// 	"/keranjang/:id",
-		// 	h.middleware.AuthMiddleware(),
-		// 	h.middleware.RoleMiddleware([]uint64{3}),
-		// 	h.UbahKeranjang,
-		// )
-		// api.DELETE(
-		// 	"/keranjang/:id",
-		// 	h.middleware.AuthMiddleware(),
-		// 	h.middleware.RoleMiddleware([]uint64{3}),
-		// 	h.HapusKeranjang,
-		// )
-		// api.GET(
-		// 	"/keranjang/:id",
-		// 	h.GetKeranjangByID,
-		// )
 	}
 
 }
@@ -118,7 +97,6 @@ func (h *KeranjangHandler) TambahKeranjang(c *gin.Context) {
 
 	keranjangSeller := keranjang.Keranjang{
 		IDUser:   userId,
-		IDSeller: body.IDSeller,
 	}
 
 	err := h.service.AddKeranjang(&keranjangSeller)
@@ -162,23 +140,3 @@ func (h *KeranjangHandler) TambahKeranjang(c *gin.Context) {
 		),
 	)
 }
-
-
-// func (h *KeranjangHandler) LihatKeranjang(c *gin.Context) {
-// 	userIdInterface, _ := c.Get("userId")
-// 	userId := uint64(userIdInterface.(float64))
-
-// 	keranjangSeller, err := h.service.GetKeranjangUser(userId)
-// 	if err != nil {
-// 		c.JSON(
-// 			http.StatusInternalServerError,
-// 			utilities.ApiResponse(
-// 				"Terjadi kesalahan Sistem",
-// 				false,
-// 				err.Error(),
-// 			),
-// 		)
-// 		return
-// 	}
-
-// }

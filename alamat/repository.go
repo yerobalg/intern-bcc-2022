@@ -44,3 +44,13 @@ func (r *AlamatRepository) GetAllUserAddress(idUser uint64) ([]Alamat, error) {
 		Find(&alamatList)
 	return alamatList, result.Error
 }
+
+func (r *AlamatRepository) GetAdminAddress() (Alamat, error) {
+	alamat := Alamat{}
+	result := r.Conn.
+		Preload("Kabupaten").
+		Preload("Kabupaten.Provinsi").
+		Where("is_user = ?", false).
+		First(&alamat)
+	return alamat, result.Error
+}

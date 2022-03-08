@@ -88,7 +88,7 @@ func (h *KategoriHandler) GetKategoriOrTag(isTag bool) func(c *gin.Context) {
 		c.JSON(
 			http.StatusOK,
 			utilities.ApiResponse(
-				"Berhasil mengambil semua kategori",
+				"Berhasil mengambil semua "+isTagName(isTag),
 				true,
 				kategori.GetSemuaKategoriFormatter(&res),
 			),
