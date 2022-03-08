@@ -27,3 +27,11 @@ func (r *UserRepository) Login(
 		First(&user)
 	return user, result.Error
 }
+
+func (r *UserRepository) GetByID(id uint64) (*Users, error) {
+	user := &Users{}
+	result := r.Conn.
+		Where("id = ?", id).
+		First(&user)
+	return user, result.Error
+}

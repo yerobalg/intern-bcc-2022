@@ -16,12 +16,6 @@ func (r *KeranjangRepository) AddKeranjang(keranjang *Keranjang) error {
 	return r.Conn.Create(keranjang).Error
 }
 
-func (r *KeranjangRepository) AddKeranjangProduk(
-	keranjangProduk *Keranjang_Produk,
-) error {
-	return r.Conn.Create(keranjangProduk).Error
-}
-
 func (r *KeranjangRepository) GetKeranjangUser(idUser uint64) (Keranjang, error) {
 	var keranjang Keranjang
 	result := r.Conn.

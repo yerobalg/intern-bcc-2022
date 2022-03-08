@@ -40,7 +40,6 @@ func InitDB() (*gorm.DB, error) {
 		&produk.Kategori_Produk{},
 		&produk.Gambar_Produk{},
 		&keranjang.Keranjang{},
-		&keranjang.Keranjang_Produk{},
 	)
 	return db, error
 }

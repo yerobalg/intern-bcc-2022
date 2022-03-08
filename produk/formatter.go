@@ -2,6 +2,7 @@ package produk
 
 import (
 	"clean-arch-2/kategori"
+	"os"
 )
 
 type ProdukInputFormat struct {
@@ -27,6 +28,7 @@ type ProdukOutputFormat struct {
 	Gender     string                    `json:"gender"`
 	Berat      uint                      `json:"berat"`
 	IsHiasan   bool                      `json:"isHiasan"`
+	Gambar     []string                  `json:"gambar"`
 	Kategori   kategori.KategoriFormat   `json:"kategori"`
 	Tags       []kategori.KategoriFormat `json:"tags"`
 }
@@ -63,9 +65,16 @@ func ProdukOutputFormatter(
 	daftarKategori := produk.KategoriProduk
 	kategoriProduk := daftarKategori[len(daftarKategori)-1].Kategori
 	var tagProduk []kategori.Kategori
-
 	for i := 0; i < len(daftarKategori[:len(daftarKategori)-1]); i++ {
 		tagProduk = append(tagProduk, daftarKategori[i].Kategori)
+	}
+
+	var daftarGambar []string
+	for _, gambar := range produk.GambarProduk {
+		daftarGambar = append(
+			daftarGambar,
+			os.Getenv("BASE_URL")+"/"+gambar.Nama,
+		)
 	}
 
 	return ProdukOutputFormat{
@@ -78,6 +87,7 @@ func ProdukOutputFormatter(
 		Gender:     produk.Gender,
 		Berat:      produk.Berat,
 		IsHiasan:   produk.IsHiasan,
+		Gambar:     daftarGambar,
 		Kategori:   kategori.GetKategoriFormatter(&kategoriProduk),
 		Tags:       kategori.GetSemuaKategoriFormatter(&tagProduk),
 	}

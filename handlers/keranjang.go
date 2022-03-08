@@ -97,6 +97,8 @@ func (h *KeranjangHandler) TambahKeranjang(c *gin.Context) {
 
 	keranjangSeller := keranjang.Keranjang{
 		IDUser:   userId,
+		IDProduk: uint64(res.ID),
+		Jumlah:   uint(body.JumlahBeli),
 	}
 
 	err := h.service.AddKeranjang(&keranjangSeller)
@@ -112,12 +114,6 @@ func (h *KeranjangHandler) TambahKeranjang(c *gin.Context) {
 		)
 		return
 	}
-
-	err = h.service.AddKeranjangProduk(&keranjang.Keranjang_Produk{
-		IDKeranjang: uint64(keranjangSeller.ID),
-		IDProduk:    uint64(res.ID),
-		Jumlah:      body.JumlahBeli,
-	})
 
 	if err != nil {
 		c.JSON(
