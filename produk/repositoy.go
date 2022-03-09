@@ -115,7 +115,7 @@ func (r *ProdukRepository) DeleteGambarProduk(
 		Nama: nama,
 	}
 	return r.Conn.Raw(
-		`DELETE FEOM gambar_produk WHERE id_produk = ? AND nama = ?`,
+		`DELETE FROM gambar_produk WHERE id_produk = ? AND nama = ?`,
 		idProduk,
 		nama,
 	).Scan(&gambar).Error

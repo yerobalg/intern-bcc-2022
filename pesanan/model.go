@@ -32,9 +32,18 @@ type Pesanan struct {
 	Keranjang        []Keranjang_Pesanan `json:"keranjang" gorm:"foreignkey:IDPesanan;constraint:OnDelete:CASCADE"`
 }
 
+func (Pesanan) TableName() string {
+	return "pesanan"
+}
+
 type Keranjang_Pesanan struct {
 	IDPesanan   uint64              `json:"idPesanan" gorm:"type:bigint;not null"`
-	IDKeranjang keranjang.Keranjang `json:"idKeranjang" gorm:"type:bigint;not null"`
+	IDKeranjang uint64              `json:"idKeranjang" gorm:"type:bigint;not null"`
 	Pesanan     Pesanan             `json:"pesanan" gorm:"foreignkey:IDPesanan;constraint:OnDelete:CASCADE"`
 	Keranjang   keranjang.Keranjang `json:"keranjang" gorm:"foreignkey:IDKeranjang;constraint:OnDelete:CASCADE"`
+}
+
+
+func (Keranjang_Pesanan) TableName() string {
+	return "keranjang_pesanan"
 }

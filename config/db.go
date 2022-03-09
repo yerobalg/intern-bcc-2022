@@ -6,6 +6,7 @@ import (
 	"clean-arch-2/kategori"
 	"clean-arch-2/produk"
 	"clean-arch-2/keranjang"
+	"clean-arch-2/pesanan"
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -40,6 +41,8 @@ func InitDB() (*gorm.DB, error) {
 		&produk.Kategori_Produk{},
 		&produk.Gambar_Produk{},
 		&keranjang.Keranjang{},
+		&pesanan.Pesanan{},
+		&pesanan.Keranjang_Pesanan{},
 	)
 	return db, error
 }
