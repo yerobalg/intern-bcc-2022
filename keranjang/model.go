@@ -26,6 +26,7 @@ type Keranjang struct {
 	IDUser   uint64        `json:"idUser" gorm:"type:bigint;not null"`
 	IDProduk uint64        `gorm:"type:bigint;not null"`
 	Jumlah   uint          `gorm:"type:integer;not null"`
+	
 	User     user.Users    `json:"user" gorm:"foreignkey:IDUser;constraint:OnDelete:CASCADE"`
 	Produk   produk.Produk `json:"produk" gorm:"foreignkey:IDProduk;constraint:OnDelete:CASCADE"`
 }
