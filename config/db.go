@@ -41,6 +41,7 @@ func InitDB() (*gorm.DB, error) {
 		&produk.Kategori_Produk{},
 		&produk.Gambar_Produk{},
 		&keranjang.Keranjang{},
+		&keranjang.Metode_Pembayaran{},
 		&pesanan.Pesanan{},
 		&pesanan.Keranjang_Pesanan{},
 	)

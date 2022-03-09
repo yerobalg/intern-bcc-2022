@@ -12,6 +12,13 @@ type RegisterUserFormat struct {
 	Email    string `json:"email"`
 }
 
+type ProfilUserFormat struct {
+	Nama     string `json:"nama"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	NomorHp  string `json:"nomorHP"`
+}
+
 func LoginFormat(user *Users, token string) LoginUserFormat {
 	return LoginUserFormat{
 		Nama:     user.Nama,
@@ -25,5 +32,14 @@ func RegisterFormat(user *Users) RegisterUserFormat {
 		Nama:     user.Nama,
 		Username: user.Username,
 		Email:    user.Email,
+	}
+}
+
+func ProfilUserFormatter (user *Users) ProfilUserFormat{
+	return ProfilUserFormat{
+		Nama:     user.Nama,
+		Username: user.Username,
+		Email:    user.Email,
+		NomorHp:  user.NomorHp,
 	}
 }

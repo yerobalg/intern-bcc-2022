@@ -59,3 +59,15 @@ INSERT INTO kategori VALUES
 (DEFAULT, '2022-03-08 11:42:08.351366+07', '2022-03-08 11:42:08.351366+07', NULL, 'White', 'true'),
 (DEFAULT, '2022-03-08 11:33:30.717901+07', '2022-03-08 11:56:52.24705+07', NULL, 'Fashion', 'false'),
 (DEFAULT, '2022-03-08 11:39:49.891421+07', '2022-03-08 11:58:22.217446+07', NULL, 'Aster', 'true');
+
+insert into metode_pembayaran values
+(default, 'BCA', 'Virtual Account', 1000, 60*24),
+(default, 'BRI', 'Virtual Account', 1000, 60*24),
+(default, 'Mandiri', 'Virtual Account', 1000, 60*24),
+(default, 'VISA', 'Kartu Debit', 0, 60),
+(default, 'MasterCard', 'Kartu Debit', 0, 60),
+(default, 'LinkAja', 'E-Wallet', 1000, 60*24),
+(default, 'OVO', 'E-Wallet', 1000, 60*24),
+(default, 'GoPay', 'E-Wallet', 1000, 60*24),
+(default, 'ShopeePay', 'E-Wallet', 1000, 60*24),
+(default, 'DANA', 'E-Wallet', 1000, 60*24);

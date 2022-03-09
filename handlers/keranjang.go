@@ -8,8 +8,8 @@ import (
 	"clean-arch-2/produk"
 	"clean-arch-2/user"
 	"clean-arch-2/utilities"
-	"net/http"
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"strings"
 )
 
@@ -187,7 +187,7 @@ func (h *KeranjangHandler) GetKeranjangUser(c *gin.Context) {
 			"Berhasil mengambil keranjang",
 			true,
 			keranjang.KeranjangFormatter(
-				&keranjangObj, 
+				&keranjangObj,
 				alamat.GetUserAlamatFormatter(&alamatUser),
 			),
 		),
@@ -197,10 +197,10 @@ func (h *KeranjangHandler) GetKeranjangUser(c *gin.Context) {
 func (h *KeranjangHandler) KonfirmasiKeranjang(c *gin.Context) {
 	var body keranjang.InputKonfirmasi
 
-	// userIdInterface, _ := c.Get("userId")
-	// userId := uint64(userIdInterface.(float64))
+	userIdInterface, _ := c.Get("userId")
+	userId := uint64(userIdInterface.(float64))
 
-	c.BindJSON(&body);
+	c.BindJSON(&body)
 
 	keranjangObj, err := h.service.GetKeranjangBatch(body.IDKeranjang)
 	if err != nil {
@@ -217,18 +217,18 @@ func (h *KeranjangHandler) KonfirmasiKeranjang(c *gin.Context) {
 
 	formatKeranjang := keranjang.KeranjangFormatter(&keranjangObj, nil)
 
-	// userObj, _ := h.userService.GetByID(userId)
+	userObj, _ := h.userService.GetByID(userId)
 
 	alamatUser, err := h.alamatService.GetById(body.IDAlamat)
 	if err != nil {
-			c.JSON(
-				http.StatusInternalServerError,
-				utilities.ApiResponse(
-					"Terjadi kesalahan Sistem",
-					false,
-					err.Error(),
-				),
-			)
+		c.JSON(
+			http.StatusInternalServerError,
+			utilities.ApiResponse(
+				"Terjadi kesalahan Sistem",
+				false,
+				err.Error(),
+			),
+		)
 		return
 	}
 
@@ -245,19 +245,27 @@ func (h *KeranjangHandler) KonfirmasiKeranjang(c *gin.Context) {
 		return
 	}
 
+	metodePembayaran, err := h.service.GetSemuaMetodeBayar()
+
 	ongkosKirim := utilities.CekOngkosKirim(
-		alamatUser.IDKabupaten, 
-		alamatAdmin.IDKabupaten, 
+		alamatUser.IDKabupaten,
+		alamatAdmin.IDKabupaten,
 		int(formatKeranjang.TotalBerat),
 	)
 
 	c.JSON(
 		http.StatusOK,
 		utilities.ApiResponse(
-			"Berhasil mengambil keranjang",
+			"Berhasil menuju menu konfirmasi",
 			true,
-			ongkosKirim,
+			keranjang.KonfirmasiPesananFormatter(
+				user.ProfilUserFormatter(userObj),
+				&keranjangObj,
+				alamat.GetAlamatByIdFormatter(*alamatUser),
+				alamat.GetAlamatByIdFormatter(alamatAdmin),
+				ongkosKirim,
+				metodePembayaran,
+			),
 		),
 	)
-
 }

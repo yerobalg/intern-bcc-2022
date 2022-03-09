@@ -38,3 +38,15 @@ func (r *KeranjangRepository) GetKeranjangBatch(
 		Find(&keranjang, idBatch)
 	return keranjang, res.Error
 }
+
+func (r *KeranjangRepository) GetSemuaMetodeBayar() ([]Metode_Pembayaran, error) {
+	var metode_pembayaran []Metode_Pembayaran
+	result := r.Conn.Find(&metode_pembayaran)
+	return metode_pembayaran, result.Error
+}
+
+func (r *KeranjangRepository) GetMetodeByID(id uint64) (Metode_Pembayaran, error) {
+	var metodePembayaran Metode_Pembayaran
+	result := r.Conn.Where("id = ?", id).Find(&metodePembayaran)
+	return metodePembayaran, result.Error
+}
