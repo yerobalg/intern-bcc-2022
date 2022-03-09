@@ -18,4 +18,8 @@ func (s UserService) Login(
 	return s.repo.Login(model)
 }
 
+func (s UserService)GetByID(id uint64) (*Users, error) {
+	return s.repo.GetByID(id)
+}
+
 

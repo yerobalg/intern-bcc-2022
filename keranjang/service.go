@@ -12,6 +12,10 @@ func (s *KeranjangService) AddKeranjang(keranjang *Keranjang) error {
 	return s.repo.AddKeranjang(keranjang)
 }
 
-func (s *KeranjangService) GetKeranjangUser(idUser uint64) (Keranjang, error) {
+func (s *KeranjangService) GetKeranjangUser(idUser uint64) ([]Keranjang, error) {
 	return s.repo.GetKeranjangUser(idUser)
+}
+
+func (s *KeranjangService) GetKeranjangBatch(idBatch []uint64) ([]Keranjang, error) {
+	return s.repo.GetKeranjangBatch(idBatch)
 }

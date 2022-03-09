@@ -8,6 +8,10 @@ type AlamatInputFormat struct {
 	AlamatPembeli bool   `json:"alamatPembeli"`
 }
 
+type KonfirmasiAlamatFormat struct {
+
+}
+
 type GetAlamatFormatter struct {
 	ID            uint            `json:"id"`
 	Nama          string          `json:"nama"`
@@ -38,9 +42,9 @@ func AlamatInputFormatter(alamat *Alamat) AlamatInputFormat {
 	}
 }
 
-func GetUserAlamatFormatter(alamat []Alamat) []GetAlamatFormatter {
+func GetUserAlamatFormatter(alamat *[]Alamat) []GetAlamatFormatter {
 	var alamatFormatted []GetAlamatFormatter
-	for _, almt := range alamat {
+	for _, almt := range *alamat {
 		alamatFormatted = append(alamatFormatted, GetAlamatByIdFormatter(almt))
 	}
 	return alamatFormatted

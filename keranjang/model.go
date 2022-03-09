@@ -11,6 +11,11 @@ type InputKeranjang struct {
 	JumlahBeli uint   `json:"jumlahBeli"`
 }
 
+type InputKonfirmasi struct {
+	IDAlamat    uint64   `json:"idAlamat"`
+	IDKeranjang []uint64 `json:"idKeranjang"`
+}
+
 type DaftarBeliProduk struct {
 	Slug       string `json:"slug" binding:"required"`
 	JumlahBeli uint   `json:"jumlahBeli"`

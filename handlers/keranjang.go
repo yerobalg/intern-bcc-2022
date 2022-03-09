@@ -8,14 +8,9 @@ import (
 	"clean-arch-2/produk"
 	"clean-arch-2/user"
 	"clean-arch-2/utilities"
-	//"fmt"
-
-	// "fmt"
 	"net/http"
-	// "strconv"
-	// "strings"
-
 	"github.com/gin-gonic/gin"
+	"strings"
 )
 
 type KeranjangHandler struct {
@@ -40,6 +35,13 @@ func (h KeranjangHandler) Setup() {
 			"/keranjang",
 			h.middleware.AuthMiddleware(),
 			h.middleware.RoleMiddleware([]uint64{2}),
+			h.GetKeranjangUser,
+		)
+		api.POST(
+			"/keranjang/konfirmasi",
+			h.middleware.AuthMiddleware(),
+			h.middleware.RoleMiddleware([]uint64{2}),
+			h.KonfirmasiKeranjang,
 		)
 	}
 
@@ -135,4 +137,127 @@ func (h *KeranjangHandler) TambahKeranjang(c *gin.Context) {
 			keranjangSeller.ID,
 		),
 	)
+}
+
+func (h *KeranjangHandler) GetKeranjangUser(c *gin.Context) {
+	userIdInterface, _ := c.Get("userId")
+	userId := uint64(userIdInterface.(float64))
+
+	keranjangObj, err := h.service.GetKeranjangUser(userId)
+
+	if err != nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			utilities.ApiResponse(
+				"Terjadi kesalahan Sistem",
+				false,
+				err.Error(),
+			),
+		)
+		return
+	}
+
+	alamatUser, err := h.alamatService.GetAllUserAddress(userId)
+	if err != nil {
+		if strings.Contains(err.Error(), "record not found") {
+			c.JSON(
+				http.StatusBadRequest,
+				utilities.ApiResponse(
+					"User belum memiliki alamat",
+					false,
+					nil,
+				),
+			)
+		} else {
+			c.JSON(
+				http.StatusInternalServerError,
+				utilities.ApiResponse(
+					"Terjadi kesalahan Sistem",
+					false,
+					err.Error(),
+				),
+			)
+		}
+		return
+	}
+
+	c.JSON(
+		http.StatusOK,
+		utilities.ApiResponse(
+			"Berhasil mengambil keranjang",
+			true,
+			keranjang.KeranjangFormatter(
+				&keranjangObj, 
+				alamat.GetUserAlamatFormatter(&alamatUser),
+			),
+		),
+	)
+}
+
+func (h *KeranjangHandler) KonfirmasiKeranjang(c *gin.Context) {
+	var body keranjang.InputKonfirmasi
+
+	// userIdInterface, _ := c.Get("userId")
+	// userId := uint64(userIdInterface.(float64))
+
+	c.BindJSON(&body);
+
+	keranjangObj, err := h.service.GetKeranjangBatch(body.IDKeranjang)
+	if err != nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			utilities.ApiResponse(
+				"Terjadi kesalahan Sistem",
+				false,
+				err.Error(),
+			),
+		)
+		return
+	}
+
+	formatKeranjang := keranjang.KeranjangFormatter(&keranjangObj, nil)
+
+	// userObj, _ := h.userService.GetByID(userId)
+
+	alamatUser, err := h.alamatService.GetById(body.IDAlamat)
+	if err != nil {
+			c.JSON(
+				http.StatusInternalServerError,
+				utilities.ApiResponse(
+					"Terjadi kesalahan Sistem",
+					false,
+					err.Error(),
+				),
+			)
+		return
+	}
+
+	alamatAdmin, err := h.alamatService.GetAdminAddress()
+	if err != nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			utilities.ApiResponse(
+				"Terjadi kesalahan Sistem",
+				false,
+				err.Error(),
+			),
+		)
+		return
+	}
+
+	ongkosKirim := utilities.CekOngkosKirim(
+		alamatUser.IDKabupaten, 
+		alamatAdmin.IDKabupaten, 
+		int(formatKeranjang.TotalBerat),
+	)
+
+	c.JSON(
+		http.StatusOK,
+		utilities.ApiResponse(
+			"Berhasil mengambil keranjang",
+			true,
+			ongkosKirim,
+		),
+	)
+
 }

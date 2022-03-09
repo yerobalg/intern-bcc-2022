@@ -16,11 +16,25 @@ func (r *KeranjangRepository) AddKeranjang(keranjang *Keranjang) error {
 	return r.Conn.Create(keranjang).Error
 }
 
-func (r *KeranjangRepository) GetKeranjangUser(idUser uint64) (Keranjang, error) {
-	var keranjang Keranjang
+func (r *KeranjangRepository) GetKeranjangUser(
+	idUser uint64,
+) ([]Keranjang, error) {
+	var keranjang []Keranjang
 	result := r.Conn.
 		Where("id_user = ?", idUser).
-		Preload("Keranjang_Produk").
+		Preload("Produk").
+		Preload("Produk.GambarProduk").
 		Find(&keranjang)
 	return keranjang, result.Error
+}
+
+func (r *KeranjangRepository) GetKeranjangBatch(
+	idBatch []uint64,
+) ([]Keranjang, error) {
+	var keranjang []Keranjang
+	res := r.Conn.
+		Preload("Produk").
+		Preload("Produk.GambarProduk").
+		Find(&keranjang, idBatch)
+	return keranjang, res.Error
 }

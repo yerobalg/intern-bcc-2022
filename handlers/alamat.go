@@ -327,7 +327,7 @@ func (h *AlamatHandler) GetAlamatUser(c *gin.Context) {
 		utilities.ApiResponse(
 			"Alamat berhasil diambil",
 			true,
-			alamat.GetUserAlamatFormatter(res),
+			alamat.GetUserAlamatFormatter(&res),
 		),
 	)
 }
