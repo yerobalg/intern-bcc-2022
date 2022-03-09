@@ -16,7 +16,7 @@ func (r *PesananRepository) AddPesanan(pesanan *Pesanan) error {
 	return r.Conn.Create(pesanan).Error
 }
 
-func (r *PesananRepository) AddKeranjangPesanaan(
+func (r *PesananRepository) AddKeranjangPesanan(
 	idPesanan uint64,
 	idKeranjang []uint64,
 ) error {
@@ -31,11 +31,20 @@ func (r *PesananRepository) AddKeranjangPesanaan(
 	return r.Conn.Create(&keranjangPesanan).Error
 }
 
+func (r *PesananRepository) GetPesanan(idPesanan uint64) (Pesanan, error) {
+	var pesanan Pesanan
+	err := r.Conn.
+		Where("id = ?", idPesanan).
+		Preload("Keranjang_Pesanan").
+		Find(&pesanan).Error
+	return pesanan, err
+}
+
 func (r *PesananRepository) DeletePesanan(pesanan *Pesanan) error {
 	return r.Conn.Delete(pesanan).Error
 }
 
-func (r *PesananRepository) DeleteKeranjangPesanaan(
+func (r *PesananRepository) DeleteKeranjangPesanan(
 	idPesanan uint64,
 ) error {
 	return r.Conn.
