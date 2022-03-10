@@ -9,14 +9,11 @@ import (
 	"clean-arch-2/produk"
 	"clean-arch-2/utilities"
 	"github.com/gin-gonic/gin"
-	// "github.com/gosimple/slug"
-	// "io"
-	//"log"
 	"net/http"
-	// "os"
 	"strconv"
 	"strings"
 	"time"
+	// "fmt"
 )
 
 type PesananHandler struct {
@@ -42,6 +39,18 @@ func (h PesananHandler) Setup() {
 			h.middleware.AuthMiddleware(),
 			h.middleware.RoleMiddleware([]uint64{2}),
 			h.GetPesananByID,
+		)
+		api.PATCH(
+			"/pesanan/:idPesanan/dibayar",
+			h.middleware.AuthMiddleware(),
+			h.middleware.RoleMiddleware([]uint64{2}),
+			h.UpdateStatusPesanan("diproses"),
+		)
+		api.PATCH(
+			"/pesanan/:idPesanan/dikirim",
+			h.middleware.AuthMiddleware(),
+			h.middleware.RoleMiddleware([]uint64{1}),
+			h.UpdateStatusPesanan("dikirim"),
 		)
 	}
 }
@@ -140,7 +149,6 @@ func (h *PesananHandler) TambahPesanan(c *gin.Context) {
 		idKeranjang = append(idKeranjang, uint64(r.ID))
 	}
 
-	
 	pesananObj := pesanan.Pesanan{
 		KodeKurir:        body.KodeKurir,
 		KodeLayanan:      body.KodeLayanan,
@@ -151,7 +159,7 @@ func (h *PesananHandler) TambahPesanan(c *gin.Context) {
 		IDMetode:         body.IDMetodePembayaran,
 		IDAlamat:         body.IDAlamat,
 	}
-	
+
 	if err = h.service.AddPesanan(&pesananObj, body.IDKeranjang); err != nil {
 		c.JSON(
 			http.StatusInternalServerError,
@@ -278,4 +286,112 @@ func (h *PesananHandler) GetPesananByID(c *gin.Context) {
 			pesanan.PesananOutputFormatter(&res, alamatAdmin),
 		),
 	)
+}
+
+func (h *PesananHandler) UpdateStatusPesanan(status string) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		id, _ := c.Params.Get("idPesanan")
+		idPesanan, _ := strconv.ParseUint(id, 10, 64)
+
+		userIdInterface, _ := c.Get("userId")
+		userId := uint64(userIdInterface.(float64))
+
+		roleIdInterface, _ := c.Get("roleId")
+		roleId := uint64(roleIdInterface.(float64))
+
+		pesananObj, err := h.service.GetPesananByID(idPesanan)
+		if err != nil {
+			if strings.Contains(err.Error(), "record not found") {
+				c.JSON(
+					http.StatusNotFound,
+					utilities.ApiResponse(
+						"Pesanan tidak ditemukan",
+						false,
+						err.Error(),
+					),
+				)
+			} else {
+				c.JSON(
+					http.StatusInternalServerError,
+					utilities.ApiResponse(
+						"Terjadi kesalahan sistem",
+						false,
+						err.Error(),
+					),
+				)
+			}
+			return
+		}
+
+		if pesananObj.IDUser != userId && roleId != 1 {
+			c.JSON(
+				http.StatusForbidden,
+				utilities.ApiResponse(
+					"Anda tidak memiliki akses ke pesanan ini",
+					false,
+					nil,
+				),
+			)
+			return
+		}
+
+		if 
+			pesananObj.BatasBayar.Unix() < time.Now().UTC().Add(time.Hour * 7).Unix() && 
+			status == "diproses" {
+			c.JSON(
+				http.StatusForbidden,
+				utilities.ApiResponse(
+					"Batas pembayaran telah habis",
+					false,
+					nil,
+				),
+			)
+			return
+		}
+
+		if !pesananObj.TanggalBayar.IsZero() && status == "diproses" {
+			c.JSON(
+				http.StatusForbidden,
+				utilities.ApiResponse(
+					"Pesanan telah dibayar",
+					false,
+					nil,
+				),
+			)
+			return
+		}
+
+		if pesananObj.TanggalBayar.IsZero() && status == "dikirim" {
+			c.JSON(
+				http.StatusForbidden,
+				utilities.ApiResponse(
+					"Pesanan belum dibayar",
+					false,
+					nil,
+				),
+			)
+			return
+		}
+
+		if err = h.service.UpdatePesanan(&pesananObj, status); err != nil {
+			c.JSON(
+				http.StatusInternalServerError,
+				utilities.ApiResponse(
+					"Terjadi kesalahan sistem",
+					false,
+					err.Error(),
+				),
+			)
+			return
+		}
+
+		c.JSON(
+			http.StatusOK,
+			utilities.ApiResponse(
+				"Status pesanan berhasil diubah menjadi "+status,
+				true,
+				nil,
+			),
+		)
+	}
 }

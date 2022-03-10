@@ -31,3 +31,10 @@ func (s *PesananService) DeletePesanan(pesanan *Pesanan) error {
 
 	return s.repo.DeleteKeranjangPesanan(uint64(pesanan.ID))
 }
+
+func (s *PesananService) UpdatePesanan(
+	pesanan *Pesanan,
+	status string,
+) error {
+	return s.repo.UpdatePesanan(pesanan, status)
+}

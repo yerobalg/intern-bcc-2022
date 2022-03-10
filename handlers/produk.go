@@ -7,12 +7,16 @@ import (
 	"clean-arch-2/produk"
 	"clean-arch-2/utilities"
 	"fmt"
+	"path/filepath"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
+
 	// "io"
 	//"log"
 	"net/http"
 	"os"
+	// "path"
 	"strconv"
 	"strings"
 )
@@ -428,7 +432,7 @@ func (h *ProdukHandler) HapusGambarProduk(c *gin.Context) {
 		return
 	}
 	// dir := os.Getenv("SERVER_PATH") + "/public/images/products/" + namaGambar
-	dir := "/public/images/products/" + namaGambar
+	dir, _ := filepath.Abs("./public/images/products/"+ namaGambar)
 	if err := os.Remove(dir); err != nil {
 		c.JSON(
 			http.StatusInternalServerError,

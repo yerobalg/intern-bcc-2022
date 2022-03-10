@@ -2,6 +2,7 @@ package pesanan
 
 import (
 	"gorm.io/gorm"
+	"time"
 )
 
 type PesananRepository struct {
@@ -57,3 +58,26 @@ func (r *PesananRepository) DeleteKeranjangPesanan(
 		Error
 }
 
+func (r *PesananRepository) UpdatePesanan(pesanan *Pesanan, status string) error {
+	var ps Pesanan
+
+	time := time.Now()
+
+	return r.Conn.Raw(
+		`
+		UPDATE 
+  		"pesanan" 
+		SET 
+  		"updated_at" = ?, 
+  		"status_pemesanan" = ?, 
+  		"tanggal_bayar" = ?
+		WHERE 
+  		"id" = ? 
+  	AND "pesanan"."deleted_at" IS NULL
+		`,
+		time,
+		status,
+		time,
+		pesanan.ID,
+	).Scan(&ps).Error
+}
