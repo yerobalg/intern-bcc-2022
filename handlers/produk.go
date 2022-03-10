@@ -428,7 +428,7 @@ func (h *ProdukHandler) HapusGambarProduk(c *gin.Context) {
 		return
 	}
 	// dir := os.Getenv("SERVER_PATH") + "/public/images/products/" + namaGambar
-	dir := "../public/images/products/" + namaGambar
+	dir := "/public/images/products/" + namaGambar
 	if err := os.Remove(dir); err != nil {
 		c.JSON(
 			http.StatusInternalServerError,

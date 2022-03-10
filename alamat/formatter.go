@@ -8,10 +8,6 @@ type AlamatInputFormat struct {
 	AlamatPembeli bool   `json:"alamatPembeli"`
 }
 
-type KonfirmasiAlamatFormat struct {
-
-}
-
 type GetAlamatFormatter struct {
 	ID            uint            `json:"id"`
 	Nama          string          `json:"nama"`

@@ -26,6 +26,7 @@ type Keranjang struct {
 	IDUser   uint64        `json:"idUser" gorm:"type:bigint;not null"`
 	IDProduk uint64        `gorm:"type:bigint;not null"`
 	Jumlah   uint          `gorm:"type:integer;not null"`
+	IsPaid   bool          `gorm:"type:boolean;default:false"`
 	User     user.Users    `json:"user" gorm:"foreignkey:IDUser;constraint:OnDelete:CASCADE"`
 	Produk   produk.Produk `json:"produk" gorm:"foreignkey:IDProduk;constraint:OnDelete:CASCADE"`
 }
@@ -33,6 +34,7 @@ type Keranjang struct {
 func (Keranjang) TableName() string {
 	return "keranjang"
 }
+
 type Metode_Pembayaran struct {
 	ID          uint64 `json:"id" gorm:"primary_key;auto_increment:true"`
 	Jenis       string `json:"jenis" gorm:"type:varchar(255);not null"`

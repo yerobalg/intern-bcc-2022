@@ -24,6 +24,7 @@ func (r *KeranjangRepository) GetKeranjangUser(
 		Where("id_user = ?", idUser).
 		Preload("Produk").
 		Preload("Produk.GambarProduk").
+		Where("is_paid = ?", false).
 		Find(&keranjang)
 	return keranjang, result.Error
 }
@@ -49,4 +50,11 @@ func (r *KeranjangRepository) GetMetodeByID(id uint64) (Metode_Pembayaran, error
 	var metodePembayaran Metode_Pembayaran
 	result := r.Conn.Where("id = ?", id).Find(&metodePembayaran)
 	return metodePembayaran, result.Error
+}
+
+func (r *KeranjangRepository) KeranjangDipesan(idKeranjang []uint64) error {
+	return r.Conn.Model(&Keranjang{}).
+		Where("id IN ?", idKeranjang).
+		Updates(Keranjang{IsPaid: true}).
+		Error
 }

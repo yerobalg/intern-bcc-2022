@@ -2,6 +2,7 @@ package produk
 
 import (
 	"gorm.io/gorm"
+	"fmt"
 )
 
 type ProdukRepository struct {
@@ -110,13 +111,31 @@ func (r *ProdukRepository) DeleteGambarProduk(
 	idProduk uint64,
 	nama string,
 ) error {
-	gambar := &Gambar_Produk {
+	gambar := &Gambar_Produk{
 		IDProduk: idProduk,
-		Nama: nama,
+		Nama:     nama,
 	}
 	return r.Conn.Raw(
 		`DELETE FROM gambar_produk WHERE id_produk = ? AND nama = ?`,
 		idProduk,
 		nama,
 	).Scan(&gambar).Error
+}
+
+func (r *ProdukRepository) KurangiStok(
+	idProduk []uint64,
+	jumlah []uint,
+) error {
+	return r.Conn.Transaction(func(tx *gorm.DB) error {
+		for i, id := range idProduk {
+			if err := tx.Model(&Produk{}).
+				Where("id = ?", id).
+				Update("stok", gorm.Expr("stok - ?", jumlah[i])).
+				Error; err != nil {
+				return err
+			}
+			fmt.Println("tes")
+		}
+		return nil
+	})
 }

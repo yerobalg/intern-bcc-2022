@@ -19,8 +19,8 @@ func (s *PesananService) AddPesanan(
 	return s.repo.AddKeranjangPesanan(uint64(pesanan.ID), idKeranjang)
 }
 
-func (s *PesananService) GetPesanan(idPesanan uint64) (Pesanan, error) {
-	return s.repo.GetPesanan(idPesanan)
+func (s *PesananService) GetPesananByID(idPesanan uint64) (Pesanan, error) {
+	return s.repo.GetPesananByID(idPesanan)
 }
 
 func (s *PesananService) DeletePesanan(pesanan *Pesanan) error {

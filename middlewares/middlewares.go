@@ -47,26 +47,6 @@ func (m *Middleware) AuthMiddleware() gin.HandlerFunc {
 	}
 }
 
-// func (m *Middleware) IdMiddleware(id1 int) gin.HandlerFunc {
-// 	return func(c *gin.Context) {
-// 		id2, _ := c.Get("id")
-// 		if id1 != id2.(int) {
-// 			c.JSON(
-// 				http.StatusUnauthorized,
-// 				utilities.ApiResponse(
-// 					"Anda tidak memiliki akses ke halaman ini",
-// 					false,
-// 					nil,
-// 				),
-// 			)
-// 			c.Abort()
-// 			return
-// 		}
-// 		c.Next()
-// 		return
-// 	}
-// }
-
 func (m *Middleware) RoleMiddleware(allowedRoles []uint64) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		roleId, _ := c.Get("roleId")

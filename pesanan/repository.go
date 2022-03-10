@@ -31,12 +31,16 @@ func (r *PesananRepository) AddKeranjangPesanan(
 	return r.Conn.Create(&keranjangPesanan).Error
 }
 
-func (r *PesananRepository) GetPesanan(idPesanan uint64) (Pesanan, error) {
+func (r *PesananRepository) GetPesananByID(idPesanan uint64) (Pesanan, error) {
 	var pesanan Pesanan
 	err := r.Conn.
 		Where("id = ?", idPesanan).
+		Preload("Alamat.Kabupaten.Provinsi").
+		Preload("Metode").
+		Preload("User").
 		Preload("Keranjang_Pesanan").
-		Find(&pesanan).Error
+		Preload("Keranjang_Pesanan.Keranjang.Produk.GambarProduk").
+		First(&pesanan).Error
 	return pesanan, err
 }
 
@@ -52,3 +56,4 @@ func (r *PesananRepository) DeleteKeranjangPesanan(
 		Delete(&Keranjang_Pesanan{}).
 		Error
 }
+

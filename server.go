@@ -8,6 +8,7 @@ import (
 	"clean-arch-2/kategori"
 	"clean-arch-2/keranjang"
 	"clean-arch-2/middlewares"
+	"clean-arch-2/pesanan"
 	"clean-arch-2/produk"
 	"clean-arch-2/role"
 	"clean-arch-2/user"
@@ -96,6 +97,18 @@ func main() {
 		middleware,
 	)
 
+	//init pesanan
+	pesananRepo := pesanan.NewPesananRepository(db)
+	pesananService := pesanan.NewPesananService(pesananRepo)
+	pesananHandler := handlers.NewPesananHandler(
+		router,
+		pesananService,
+		keranjangService,
+		alamatService,
+		produkService,
+		middleware,
+	)
+
 	//setup router
 	handlers.NewHandlers(
 		authHandler,
@@ -104,6 +117,7 @@ func main() {
 		kategoriHandler,
 		produkHandler,
 		keranjangHandler,
+		pesananHandler,
 	).Setup()
 
 	router.Gin.Run(":" + os.Getenv("PORT"))

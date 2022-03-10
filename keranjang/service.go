@@ -27,3 +27,7 @@ func (s *KeranjangService) GetSemuaMetodeBayar() ([]Metode_Pembayaran, error) {
 func (s *KeranjangService) GetMetodeByID(id uint64) (Metode_Pembayaran, error) {
 	return s.repo.GetMetodeByID(id)
 }
+
+func (s *KeranjangService) KeranjangDipesan(idKeranjang []uint64) error {
+	return s.repo.KeranjangDipesan(idKeranjang)
+}

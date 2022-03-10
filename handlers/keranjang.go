@@ -134,7 +134,7 @@ func (h *KeranjangHandler) TambahKeranjang(c *gin.Context) {
 		utilities.ApiResponse(
 			"Berhasil menambahkan keranjang",
 			true,
-			keranjangSeller.ID,
+			gin.H{"idKeranjang": keranjangSeller.ID},
 		),
 	)
 }

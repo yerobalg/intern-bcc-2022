@@ -39,6 +39,7 @@ type KeranjangProduk struct {
 	Harga        uint64   `json:"harga"`
 	JumlahBeli   uint     `json:"jumlahBeli"`
 	Berat        uint     `json:"berat"`
+	IsHiasan     bool     `json:"isHiasan"`
 	GambarProduk []string `json:"gambarProduk"`
 }
 
@@ -64,6 +65,7 @@ func KeranjangProdukFormatter(
 			Harga:        uint64(krj.Produk.Harga),
 			JumlahBeli:   krj.Jumlah,
 			Berat:        krj.Produk.Berat,
+			IsHiasan:     krj.Produk.IsHiasan,
 			GambarProduk: gambar,
 		})
 	}

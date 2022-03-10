@@ -57,3 +57,10 @@ func (s *ProdukService) DeleteGambarProduk(
 func (s *ProdukService) Delete(produk *Produk) error {
 	return s.repo.Delete(produk)
 }
+
+func (s *ProdukService) KurangiStok(
+	idProduk []uint64,
+	jumlah []uint,
+) (error) {
+	return s.repo.KurangiStok(idProduk, jumlah)
+}

@@ -13,6 +13,7 @@ func NewHandlers(
 	kategoriHandler KategoriHandler,
 	produkHandler ProdukHandler,
 	keranjangHandler KeranjangHandler,
+	pesananHandler PesananHandler,
 ) Handlers {
 	return Handlers{
 		authHandler,
@@ -21,6 +22,7 @@ func NewHandlers(
 		kategoriHandler,
 		produkHandler,
 		keranjangHandler,
+		pesananHandler,
 	}
 }
 
