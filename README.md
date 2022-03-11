@@ -15,10 +15,9 @@ List dependensi:
 
 # Tutorial Instalasi
 1. Clone repo github ini dalam folder yang bernama clean-arch-2
-2. Install dependensi berikut:
-   
-4. langkapi file env.server dan env.database. Jika sudah, rename dan tambahkan tanda titik di depan, menjadi .env.server dan .env.database
-5. Buat database postgres dan jalankan seeder1.sql
-6. Setelah sudah, run server untuk melakukan migration.
-7. Matikan server, kemudian jalankan seeder2.sql
-8. Server siap digunakan
+2. Lakukan instalasi pada dependensi diatas   
+3. langkapi file env.server dan env.database. Jika sudah, rename dan tambahkan tanda titik di depan, menjadi .env.server dan .env.database
+4. Buat database postgres dan jalankan seeder1.sql
+5. Setelah sudah, run server untuk melakukan migration.
+6. Matikan server, kemudian jalankan seeder2.sql
+7. Server siap digunakan
