@@ -48,11 +48,8 @@ func (s *ProdukService) Update(
 	return s.repo.SaveKategoriProduk(idKategori, uint64(produk.ID))
 }
 
-func (s *ProdukService) DeleteGambarProduk(
-	idProduk uint64,
-	nama string,
-) error {
-	return s.repo.DeleteGambarProduk(idProduk, nama)
+func (s *ProdukService) DeleteGambarProduk(idProduk uint64) error {
+	return s.repo.DeleteGambarProduk(idProduk)
 }
 
 func (s *ProdukService) CariProduk(

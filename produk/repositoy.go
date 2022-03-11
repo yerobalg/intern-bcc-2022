@@ -121,17 +121,8 @@ func (r *ProdukRepository) Delete(produk *Produk) error {
 
 func (r *ProdukRepository) DeleteGambarProduk(
 	idProduk uint64,
-	nama string,
 ) error {
-	gambar := &Gambar_Produk{
-		IDProduk: idProduk,
-		Nama:     nama,
-	}
-	return r.Conn.Raw(
-		`DELETE FROM gambar_produk WHERE id_produk = ? AND nama = ?`,
-		idProduk,
-		nama,
-	).Scan(&gambar).Error
+	return r.Conn.Delete(&Gambar_Produk{}, "id_produk = ?", idProduk).Error
 }
 
 func (r *ProdukRepository) CariProdukTerbaru(
@@ -170,7 +161,7 @@ func (r *ProdukRepository) CariProdukTerbaru(
 	res := trx.
 		Where("produk.is_hiasan = ?", false).
 		Order("produk.created_at DESC").
-		Limit(10).Offset(offset).Find(&prod)
+		Limit(12).Offset(offset).Find(&prod)
 	return prod, res.Error, res.RowsAffected
 }
 
@@ -181,7 +172,7 @@ func (r *ProdukRepository) CariProdukTerlaris(
 	gender string,
 	page int,
 ) ([]ProdukLite, error, int64) {
-	offset := (page - 1) * 10
+	offset := (page - 1) * 12
 	var prod []ProdukLite
 	trx := r.Conn.Model(&Produk{}).
 		Select(`
@@ -213,7 +204,7 @@ func (r *ProdukRepository) CariProdukTerlaris(
 		Where("produk.is_hiasan = ?", false).
 		Group("produk.id, produk.nama_produk, produk.harga, produk.diskon").
 		Order("count(keranjang.id) DESC, harga").
-		Limit(10).Offset(offset).Find(&prod)
+		Limit(12).Offset(offset).Find(&prod)
 	return prod, res.Error, res.RowsAffected
 }
 

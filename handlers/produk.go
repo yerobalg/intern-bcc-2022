@@ -64,7 +64,7 @@ func (h ProdukHandler) Setup() {
 			h.TambahGambarProduk,
 		)
 		api.DELETE(
-			"produk/gambar/:slug/:namaGambar",
+			"produk/gambar/:slug/",
 			h.middleware.AuthMiddleware(),
 			h.middleware.RoleMiddleware([]uint64{1}),
 			h.HapusGambarProduk,
@@ -507,7 +507,6 @@ func (h *ProdukHandler) TambahGambarProduk(c *gin.Context) {
 
 func (h *ProdukHandler) HapusGambarProduk(c *gin.Context) {
 	slug, _ := c.Params.Get("slug")
-	namaGambar, _ := c.Params.Get("namaGambar")
 
 	res, err := h.service.GetBySlug(slug)
 	if err != nil {
@@ -532,21 +531,23 @@ func (h *ProdukHandler) HapusGambarProduk(c *gin.Context) {
 		}
 		return
 	}
-	// dir := os.Getenv("SERVER_PATH") + "/public/images/products/" + namaGambar
-	dir, _ := filepath.Abs("./public/images/products/" + namaGambar)
-	if err := os.Remove(dir); err != nil {
-		c.JSON(
-			http.StatusInternalServerError,
-			utilities.ApiResponse(
-				"Terjadi kesalahan Sistem",
-				false,
-				err.Error(),
-			),
-		)
-		return
+
+	for _, gambar := range res.GambarProduk {
+		dir, _ := filepath.Abs("./" + gambar.Nama)
+		if err := os.Remove(dir); err != nil {
+			c.JSON(
+				http.StatusInternalServerError,
+				utilities.ApiResponse(
+					"Terjadi kesalahan Sistem",
+					false,
+					err.Error(),
+				),
+			)
+			return
+		}
 	}
 
-	err = h.service.DeleteGambarProduk(uint64(res.ID), namaGambar)
+	err = h.service.DeleteGambarProduk(uint64(res.ID))
 	if err != nil {
 		c.JSON(
 			http.StatusInternalServerError,
