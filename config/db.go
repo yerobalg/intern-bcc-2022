@@ -2,6 +2,7 @@ package config
 
 import (
 	"clean-arch-2/alamat"
+	"clean-arch-2/role"
 	"clean-arch-2/user"
 	"clean-arch-2/kategori"
 	"clean-arch-2/produk"
@@ -33,7 +34,7 @@ func InitDB() (*gorm.DB, error) {
 	fmt.Println("Successfully connected to database!")
 
 	db.AutoMigrate(
-		// &models.Roles{},
+		&role.Roles{},
 		&user.Users{},
 		&alamat.Alamat{},
 		&kategori.Kategori{},	
