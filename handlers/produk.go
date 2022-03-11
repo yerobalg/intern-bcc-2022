@@ -30,7 +30,6 @@ type ProdukHandler struct {
 
 func (h ProdukHandler) Setup() {
 	api := h.handler.BaseRouter
-	// api = h.handler.BaseRouter.Use(h.middleware.RoleMiddleware([]uint64{2, 3}))
 	{
 		api.POST(
 			"/produk",
@@ -39,14 +38,9 @@ func (h ProdukHandler) Setup() {
 			h.TambahProduk,
 		)
 		api.GET(
-			"/produk",
-			// h.GetAlamatUser,
+			"/produk/search/",
+			h.CariProduk,
 		)
-		// api.GET(
-		// 	"/alamat/:idAlamat",
-		// 	h.middleware.AuthMiddleware(),
-		// 	h.GetAlamatById,
-		// )
 		api.PUT(
 			"/produk/:slug",
 			h.middleware.AuthMiddleware(),
@@ -106,7 +100,7 @@ func (h *ProdukHandler) TambahProduk(c *gin.Context) {
 		return
 	}
 
-	if len(body.IdTags) == 0 {
+	if len(body.IdTags) == 0 && body.IsHiasan == false {
 		c.JSON(
 			http.StatusBadRequest,
 			utilities.ApiResponse(
@@ -243,7 +237,7 @@ func (h *ProdukHandler) UbahProduk(c *gin.Context) {
 func (h *ProdukHandler) GetProdukBySlug(c *gin.Context) {
 	slug, _ := c.Params.Get("slug")
 
-	res, err := h.service.GetBySlug(slug)
+	produkObj, err := h.service.GetBySlug(slug)
 	if err != nil {
 		if strings.Contains(err.Error(), "record not found") {
 			c.JSON(
@@ -267,12 +261,26 @@ func (h *ProdukHandler) GetProdukBySlug(c *gin.Context) {
 		return
 	}
 
+	idKategori := produkObj.KategoriProduk[len(produkObj.KategoriProduk)-1].IDKategori
+
+	hiasanProduk, err, hasil := h.service.GetHiasanProduk(idKategori)
+
+	var idHiasan []uint64
+	for _, h := range hiasanProduk {
+		idHiasan = append(idHiasan, h.ID)
+	}
+
+	gambarHiasan, err := h.service.GetGambarProduk(idHiasan)
+
 	c.JSON(
 		http.StatusOK,
 		utilities.ApiResponse(
 			"Berhasil mengambil produk",
 			true,
-			produk.ProdukOutputFormatter(*res),
+			produk.ProdukOutputFormatter(
+				*produkObj,
+				produk.ProdukSearchFormatter(hiasanProduk, gambarHiasan, hasil),
+			),
 		),
 	)
 }
@@ -321,7 +329,100 @@ func (h *ProdukHandler) HapusProduk(c *gin.Context) {
 		utilities.ApiResponse(
 			"Produk berhasil dihapus",
 			true,
-			produk.ProdukOutputFormatter(*res),
+			nil),
+	)
+}
+
+func (h *ProdukHandler) CariProduk(c *gin.Context) {
+	tagsKey, isTagsExist := c.GetQuery("tags")
+	kategoriKey, isKategoriExist := c.GetQuery("kategori")
+	kataKunciKey, _ := c.GetQuery("kata-kunci")
+	maxHargaKey, isMaxHargaExist := c.GetQuery("max-harga")
+	pageKey, isPageExist := c.GetQuery("page")
+	genderKey, isGenderExist := c.GetQuery("gender")
+	sortKey, isSortExist := c.GetQuery("sort")
+
+	if !isGenderExist {
+		genderKey = "BOTH"
+	} else {
+		genderKey = strings.ToUpper(genderKey)
+	}
+
+	pageNum := 1
+	if isPageExist {
+		pageInt, _ := strconv.Atoi(pageKey)
+		pageNum = pageInt
+	}
+
+	if !isSortExist {
+		sortKey = "popular"
+	}
+
+	maxHarga := uint64(0)
+	if isMaxHargaExist {
+		maxHargaInt, _ := strconv.Atoi(maxHargaKey)
+		maxHarga = uint64(maxHargaInt)
+	}
+
+	var kategoriList []uint64
+	if isKategoriExist {
+		kategoriInt, _ := strconv.Atoi(kategoriKey)
+		kategoriList = append(kategoriList, uint64(kategoriInt))
+	}
+
+	if isTagsExist {
+		tags := strings.Split(tagsKey, ",")
+		for _, tag := range tags {
+			tagInt, _ := strconv.Atoi(tag)
+			kategoriList = append(kategoriList, uint64(tagInt))
+		}
+	}
+
+	searchRes, err, jumlah := h.service.CariProduk(
+		kategoriList,
+		kataKunciKey,
+		maxHarga,
+		genderKey,
+		pageNum,
+		sortKey,
+	)
+	if err != nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			utilities.ApiResponse(
+				"Terjadi kesalahan sistem",
+				false,
+				err.Error(),
+			),
+		)
+		return
+	}
+
+	var idProduk []uint64
+
+	for _, produk := range searchRes {
+		idProduk = append(idProduk, produk.ID)
+	}
+
+	res, err := h.service.GetGambarProduk(idProduk)
+	if err != nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			utilities.ApiResponse(
+				"Terjadi kesalahan sistem",
+				false,
+				err.Error(),
+			),
+		)
+		return
+	}
+
+	c.JSON(
+		http.StatusOK,
+		utilities.ApiResponse(
+			"Berhasil mengambil produk",
+			true,
+			produk.ProdukSearchFormatter(searchRes, res, jumlah),
 		),
 	)
 }
@@ -432,7 +533,7 @@ func (h *ProdukHandler) HapusGambarProduk(c *gin.Context) {
 		return
 	}
 	// dir := os.Getenv("SERVER_PATH") + "/public/images/products/" + namaGambar
-	dir, _ := filepath.Abs("./public/images/products/"+ namaGambar)
+	dir, _ := filepath.Abs("./public/images/products/" + namaGambar)
 	if err := os.Remove(dir); err != nil {
 		c.JSON(
 			http.StatusInternalServerError,

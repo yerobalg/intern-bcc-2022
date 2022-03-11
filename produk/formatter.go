@@ -31,6 +31,7 @@ type ProdukOutputFormat struct {
 	Gambar     []string                  `json:"gambar"`
 	Kategori   kategori.KategoriFormat   `json:"kategori"`
 	Tags       []kategori.KategoriFormat `json:"tags"`
+	Hiasan     ProdukSearchFormat        `json:"hiasan"`
 }
 
 type Seller struct {
@@ -61,6 +62,7 @@ func ProdukInputFormatter(
 
 func ProdukOutputFormatter(
 	produk Produk,
+	hiasan ProdukSearchFormat,
 ) ProdukOutputFormat {
 	daftarKategori := produk.KategoriProduk
 	kategoriProduk := daftarKategori[len(daftarKategori)-1].Kategori
@@ -77,6 +79,13 @@ func ProdukOutputFormatter(
 		)
 	}
 
+	if len(daftarGambar) == 0 {
+		daftarGambar = append(
+			daftarGambar,
+			os.Getenv("BASE_URL")+"/public/images/products/default.jpg",
+		)
+	}
+
 	return ProdukOutputFormat{
 		NamaProduk: produk.NamaProduk,
 		Slug:       produk.Slug,
@@ -90,5 +99,57 @@ func ProdukOutputFormatter(
 		Gambar:     daftarGambar,
 		Kategori:   kategori.GetKategoriFormatter(&kategoriProduk),
 		Tags:       kategori.GetSemuaKategoriFormatter(&tagProduk),
+		Hiasan:     hiasan,
+	}
+
+}
+
+type ProdukLiteFormat struct {
+	Produk ProdukLite `json:"produk"`
+	Gambar []string   `json:"gambar"`
+}
+
+type ProdukSearchFormat struct {
+	JumlahHasil int64              `json:"jumlahHasil"`
+	Produk      []ProdukLiteFormat `json:"daftarProduk"`
+}
+
+func ProdukSearchFormatter(
+	hasilCari []ProdukLite,
+	daftarGambar []Produk,
+	jumlahHasil int64,
+) ProdukSearchFormat {
+	var daftarProduk []ProdukLiteFormat
+	for _, produkCari := range hasilCari {
+		for _, produk := range daftarGambar {
+			if produkCari.ID == uint64(produk.ID) {
+				var daftarGambar []string
+				for _, gambar := range produk.GambarProduk {
+					daftarGambar = append(
+						daftarGambar,
+						os.Getenv("BASE_URL")+"/"+gambar.Nama,
+					)
+				}
+				if len(daftarGambar) == 0 {
+					daftarGambar = append(
+						daftarGambar,
+						os.Getenv("BASE_URL")+"/public/images/products/default.jpg",
+					)
+				}
+				daftarProduk = append(
+					daftarProduk,
+					ProdukLiteFormat{
+						Produk: produkCari,
+						Gambar: daftarGambar,
+					},
+				)
+				break
+			}
+		}
+	}
+
+	return ProdukSearchFormat{
+		JumlahHasil: jumlahHasil,
+		Produk:      daftarProduk,
 	}
 }

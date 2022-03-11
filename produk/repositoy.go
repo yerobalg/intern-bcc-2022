@@ -1,8 +1,8 @@
 package produk
 
 import (
-	"gorm.io/gorm"
 	"fmt"
+	"gorm.io/gorm"
 )
 
 type ProdukRepository struct {
@@ -60,11 +60,23 @@ func (r *ProdukRepository) GetBySlug(slug string) (*Produk, error) {
 	return &produk, result.Error
 }
 
-// func (r *ProdukRepository) GetByIdSeller(idSeller uint64) (*[]Produk, error) {
-// 	var produk []Produk
-// 	result := r.Conn.Where("id_seller = ?", idSeller).Find(&produk)
-// 	return &produk, result.Error
-// }
+func (r *ProdukRepository) GetHiasanProduk(idKategori uint64) ([]ProdukLite, error, int64) {
+	var prod []ProdukLite
+	res := r.Conn.
+		Model(&Produk{}).
+		Select(`
+			produk.id,
+			produk.slug, 
+			produk.nama_produk, 
+			produk.harga, 
+			produk.diskon
+		`).
+		Joins("LEFT JOIN kategori_produk ON produk.id = kategori_produk.id_produk").
+		Where("kategori_produk.id_kategori = ?", idKategori).
+		Where("produk.is_hiasan = ?", true).
+		Find(&prod)
+	return prod, res.Error, res.RowsAffected
+}
 
 func (r *ProdukRepository) Update(prod *Produk) error {
 	return r.Conn.Raw(
@@ -120,6 +132,100 @@ func (r *ProdukRepository) DeleteGambarProduk(
 		idProduk,
 		nama,
 	).Scan(&gambar).Error
+}
+
+func (r *ProdukRepository) CariProdukTerbaru(
+	idKategori []uint64,
+	kataKunci string,
+	maksHarga uint64,
+	gender string,
+	page int,
+) ([]ProdukLite, error, int64) {
+	offset := (page - 1) * 12
+	var prod []ProdukLite
+	trx := r.Conn.Model(&Produk{}).
+		Select(`
+			produk.id,
+			produk.slug, 
+			produk.nama_produk, 
+			produk.harga, 
+			produk.diskon
+		`)
+
+	if len(idKategori) > 0 {
+		trx = trx.
+			Joins("LEFT JOIN kategori_produk ON produk.id = kategori_produk.id_produk").
+			Where("kategori_produk.id_kategori IN (?)", idKategori)
+	}
+	if kataKunci != "" {
+		trx = trx.Where("produk.nama_produk ILIKE ?", "%"+kataKunci+"%")
+	}
+	if maksHarga != 0 {
+		trx = trx.Where("(1-produk.diskon)*produk.harga <= ?", maksHarga)
+	}
+	if gender != "BOTH" {
+		trx = trx.Where("produk.gender = ?", gender)
+	}
+
+	res := trx.
+		Where("produk.is_hiasan = ?", false).
+		Order("produk.created_at DESC").
+		Limit(10).Offset(offset).Find(&prod)
+	return prod, res.Error, res.RowsAffected
+}
+
+func (r *ProdukRepository) CariProdukTerlaris(
+	idKategori []uint64,
+	kataKunci string,
+	maksHarga uint64,
+	gender string,
+	page int,
+) ([]ProdukLite, error, int64) {
+	offset := (page - 1) * 10
+	var prod []ProdukLite
+	trx := r.Conn.Model(&Produk{}).
+		Select(`
+			count(keranjang.id), 
+			produk.id,
+			produk.slug, 
+			produk.nama_produk, 
+			produk.harga, 
+			produk.diskon
+		`).
+		Joins("LEFT JOIN keranjang ON produk.id = keranjang.id_produk AND keranjang.is_paid = true")
+
+	if len(idKategori) > 0 {
+		trx = trx.
+			Joins("LEFT JOIN kategori_produk ON produk.id = kategori_produk.id_produk").
+			Where("kategori_produk.id_kategori IN (?)", idKategori)
+	}
+	if kataKunci != "" {
+		trx = trx.Where("produk.nama_produk ILIKE ?", "%"+kataKunci+"%")
+	}
+	if maksHarga != 0 {
+		trx = trx.Where("(1-produk.diskon)*produk.harga <= ?", maksHarga)
+	}
+	if gender != "BOTH" {
+		trx = trx.Where("produk.gender = ?", gender)
+	}
+
+	res := trx.
+		Where("produk.is_hiasan = ?", false).
+		Group("produk.id, produk.nama_produk, produk.harga, produk.diskon").
+		Order("count(keranjang.id) DESC, harga").
+		Limit(10).Offset(offset).Find(&prod)
+	return prod, res.Error, res.RowsAffected
+}
+
+func (r *ProdukRepository) GetGambarProduk(
+	idProduk []uint64,
+) ([]Produk, error) {
+	var prod []Produk
+	res := r.Conn.
+		Preload("GambarProduk").
+		Where("id IN (?)", idProduk).
+		Find(&prod)
+	return prod, res.Error
 }
 
 func (r *ProdukRepository) KurangiStok(

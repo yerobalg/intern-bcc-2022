@@ -50,6 +50,15 @@ type ProdukInput struct {
 	IdTags     []uint64 `json:"idTags"`
 }
 
+
+type ProdukLite struct {
+	ID         uint64 `json:"id"`
+	Slug       string `json:"slug"`
+	NamaProduk string `json:"nama_produk"`
+	Harga      uint64 `json:"harga"`
+	Diskon     float64 		`json:"diskon"`
+}
+
 func (Produk) TableName() string {
 	return "produk"
 }
