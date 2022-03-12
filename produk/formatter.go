@@ -2,7 +2,6 @@ package produk
 
 import (
 	"clean-arch-2/kategori"
-	"os"
 )
 
 type ProdukInputFormat struct {
@@ -75,14 +74,14 @@ func ProdukOutputFormatter(
 	for _, gambar := range produk.GambarProduk {
 		daftarGambar = append(
 			daftarGambar,
-			os.Getenv("BASE_URL")+"/"+gambar.Nama,
+			gambar.Nama,
 		)
 	}
 
 	if len(daftarGambar) == 0 {
 		daftarGambar = append(
 			daftarGambar,
-			os.Getenv("BASE_URL")+"/public/images/products/default.jpg",
+			"public/images/products/default.jpg",
 		)
 	}
 
@@ -127,13 +126,13 @@ func ProdukSearchFormatter(
 				for _, gambar := range produk.GambarProduk {
 					daftarGambar = append(
 						daftarGambar,
-						os.Getenv("BASE_URL")+"/"+gambar.Nama,
+						gambar.Nama,
 					)
 				}
 				if len(daftarGambar) == 0 {
 					daftarGambar = append(
 						daftarGambar,
-						os.Getenv("BASE_URL")+"/public/images/products/default.jpg",
+						"public/images/products/default.jpg",
 					)
 				}
 				daftarProduk = append(

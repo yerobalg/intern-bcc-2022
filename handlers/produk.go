@@ -490,9 +490,6 @@ func (h *ProdukHandler) TambahGambarProduk(c *gin.Context) {
 		return
 	}
 
-	for i := 0; i < len(url); i++ {
-		url[i] = os.Getenv("BASE_URL") + "/" + url[i]
-	}
 
 	// Response
 	c.JSON(

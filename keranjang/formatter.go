@@ -4,7 +4,6 @@ import (
 	"clean-arch-2/alamat"
 	"clean-arch-2/user"
 	"clean-arch-2/utilities"
-	"os"
 )
 
 type KeranjangFormat struct {
@@ -53,7 +52,7 @@ func KeranjangProdukFormatter(
 	for _, krj := range *keranjang {
 		var gambar []string
 		for _, gmb := range krj.Produk.GambarProduk {
-			gambar = append(gambar, os.Getenv("BASE_URL")+"/"+gmb.Nama)
+			gambar = append(gambar, gmb.Nama)
 		}
 		totalHarga += (1 - krj.Produk.Diskon) * float64(krj.Produk.Harga) * float64(krj.Jumlah)
 		totalBerat += uint64(krj.Produk.Berat) * uint64(krj.Jumlah)
