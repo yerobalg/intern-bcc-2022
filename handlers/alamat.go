@@ -145,7 +145,7 @@ func (h *AlamatHandler) TambahAlamat(c *gin.Context) {
 	role, _ := h.roleService.GetRoleById(roleId)
 
 	c.JSON(
-		http.StatusOK,
+		http.StatusCreated,
 		utilities.ApiResponse(
 			"Alamat "+role.Nama+" berhasil ditambahkan",
 			true,

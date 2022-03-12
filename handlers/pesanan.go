@@ -197,7 +197,7 @@ func (h *PesananHandler) TambahPesanan(c *gin.Context) {
 	}
 
 	c.JSON(
-		http.StatusOK,
+		http.StatusCreated,
 		utilities.ApiResponse(
 			"Pesanan berhasil ditambahkan",
 			true,

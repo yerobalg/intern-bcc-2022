@@ -125,7 +125,7 @@ func (h *KategoriHandler) TambahKategori(c *gin.Context) {
 	}
 
 	c.JSON(
-		http.StatusOK,
+		http.StatusCreated,
 		utilities.ApiResponse(
 			"Berhasil menambahkan "+isTagName(kategoriObj.IsTag),
 			true,

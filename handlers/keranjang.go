@@ -130,7 +130,7 @@ func (h *KeranjangHandler) TambahKeranjang(c *gin.Context) {
 	}
 
 	c.JSON(
-		http.StatusOK,
+		http.StatusCreated,
 		utilities.ApiResponse(
 			"Berhasil menambahkan keranjang",
 			true,

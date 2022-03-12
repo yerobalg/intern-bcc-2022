@@ -151,7 +151,7 @@ func (h *ProdukHandler) TambahProduk(c *gin.Context) {
 	}
 
 	c.JSON(
-		http.StatusOK,
+		http.StatusCreated,
 		utilities.ApiResponse(
 			"Produk berhasil ditambahkan",
 			true,
@@ -493,7 +493,7 @@ func (h *ProdukHandler) TambahGambarProduk(c *gin.Context) {
 
 	// Response
 	c.JSON(
-		http.StatusOK,
+		http.StatusCreated,
 		utilities.ApiResponse(
 			"Berhasil Mengupload Gambar",
 			true,
