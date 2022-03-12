@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/gin-contrib/cors"
+	// "github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -11,7 +11,6 @@ type Router struct {
 }
 
 func NewRouter(engine *gin.Engine) Router {
-	engine.Use(cors.Default())
 	return Router{Gin: engine, BaseRouter: engine.Group("/api/v1")}
 
 }

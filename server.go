@@ -12,6 +12,7 @@ import (
 	"clean-arch-2/produk"
 	"clean-arch-2/role"
 	"clean-arch-2/user"
+	// "github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"os"
 )
@@ -30,7 +31,9 @@ func main() {
 	// engine.Static("/public/images/products", "./public/images/products")
 
 	//init router
-	router := config.NewRouter(gin.Default())
+	engine := gin.Default()
+	engine.Use(middlewares.CorsMiddleware())
+	router := config.NewRouter(engine)
 	router.Gin.Static("/public/images/users", "./public/images/users")
 	router.Gin.Static("/public/images/products", "./public/images/products")
 
